@@ -25,6 +25,7 @@ function initGame() {
 // ロード前に呼ばれる関数
 function preload () {
     this.load.image("monster", "src/enemy/mon_025r.png");
+    this.scene.add('my_scene', MyScene);
 }
 
 // 作成時に呼ばれる関数
@@ -35,7 +36,17 @@ function create () {
     startButton.setInteractive();
     startButton.on('pointerdown', () => {
         // ゲームを開始する
+        this.scene.start('my_scene');
     })
+}
+
+
+class MyScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'my_scene' });
+    }
+    create() {
+    }   
 }
 
 // フレームごとに呼ばれる関数
