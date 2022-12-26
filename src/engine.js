@@ -21,10 +21,12 @@ function initGame() {
 
 // ロード前に呼ばれる関数
 function preload () {
+    this.load.image("monster", "src/enemy/mon_025r.png");
 }
 
 // 作成時に呼ばれる関数
 function create () {
+    this.add.image(100, 200, "monster");
 }
 
 // フレームごとに呼ばれる関数
