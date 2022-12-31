@@ -5,11 +5,23 @@ class BattleScene extends Phaser.Scene {
         super({ key: 'battle_scene' });
     }
 
+    // ロード前に呼ばれる関数
+    preload () {
+        this.load.image("enemy", "src/enemy/mon_025r.png");
+        this.load.image("player", "src/player/mon_234r.png");
+    }
+
 
     create() {
         // キャラクターを配置する
-        this.player = new Character(this, 100, 100, "player", 0);
-        this.enemy = new Character(this, 300, 100, "enemy", 0);
+        this.player = new Character(this, 100, 100, "player", 0, {
+            name: "player",
+            hp: 300,
+        });
+        this.enemy = new Character(this, 300, 100, "enemy", 0, {
+            name: "enemy",
+            hp: 1000,
+        });
 
         // テキストオブジェクトを作成する
         this.narrationText = this.add.text(10, 10, "", {
@@ -24,9 +36,6 @@ class BattleScene extends Phaser.Scene {
             callbackScope: this,
             loop: true,
         });
-
-        // 入力を受け付けるためのハンドラーを設定する
-        this.input.keyboard.on("keydown", this.onKeyDown, this);
 
         // 戦闘終了を判定するための変数を初期化する
         this.isBattleEnd = false;
@@ -52,27 +61,18 @@ class BattleScene extends Phaser.Scene {
     nextTurn() {
         // 現在のターンを切り替える
         this.currentTurn = this.currentTurn === "player" ? "enemy" : "player";
-
-        // 現在のターンのキャラクターを取得する
-        const currentCharacter = this[this.currentTurn];
-        // 現在のターンのキャラクターが行動できるか判定する
-        if (currentCharacter.canAct()) {
-            // 行動できる場合、アクションを実行する
-            currentCharacter.act();
-        } else {
-            // 行動できない場合、次のターンへ進む
-            this.nextTurn();
-        }
-    }
-
-    // キーが押されたときに呼ばれるハンドラー
-    onKeyDown(event) {
+        
         // 現在のターンのキャラクターを取得する
         const currentCharacter = this[this.currentTurn];
 
         // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
         this.narrationText.setText(`${currentCharacter.name}のターン`);
 
+        this.handleTurn(currentCharacter);
+    }
+
+    // ターンのメイン処理を行うメソッド
+    handleTurn(currentCharacter) {
         // 現在のターンのキャラクターが行動できるか判定する
         if (currentCharacter.canAct()) {
             // 行動できる場合、アクションを実行する
