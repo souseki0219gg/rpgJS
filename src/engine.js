@@ -26,7 +26,6 @@ function initGame() {
 
 // ロード前に呼ばれる関数
 function preload () {
-    this.load.image("monster", "src/enemy/mon_025r.png");
     this.scene.add('battle_scene', BattleScene);
 }
 

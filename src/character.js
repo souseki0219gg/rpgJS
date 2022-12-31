@@ -1,11 +1,12 @@
 class Character extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, frame) {
+    constructor(scene, x, y, texture, frame, status = {}) {
         super(scene, x, y, texture, frame);
 
         // キャラクターのステータスを定義する
-        this.hp=100;
-        this.attack=10;
-        this.defense=5;
+        this.name = status.name || "名無し";
+        this.hp = status.hp || 100;
+        this.attack = status.attack || 10;
+        this.defense = status.defense || 5;
 
         // キャラクターをシーンに追加する
         scene.add.existing(this);
@@ -22,7 +23,7 @@ class Character extends Phaser.GameObjects.Sprite {
     // キャラクターが死亡するメソッド
     die() {
         // キャラクターを削除する処理をここに記述する
-        console.log("死亡した");
+        console.log(`${this.name}は死亡した`);
     }
 
     //キャラクターが行動可能か判定するメソッド
@@ -32,7 +33,7 @@ class Character extends Phaser.GameObjects.Sprite {
 
     // キャラクターが行動するメソッド
     act() {
-        console.log('行動した');
+        console.log(`${this.name}は行動した`);
     }
 }
 
