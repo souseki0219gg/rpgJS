@@ -138,7 +138,7 @@ class MyScene extends Phaser.Scene {
         const currentCharacter = this[this.currentTurn];
 
 
-   
+
         // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
         this.narrationText.setText(`${currentCharacter.name}のターン`);
 
@@ -148,7 +148,7 @@ class MyScene extends Phaser.Scene {
             currentCharacter.act();
         } else {
             // 行動できない場合、次のターンへ進む
-             this.nextTurn();
+            this.nextTurn();
 
         }
     }
