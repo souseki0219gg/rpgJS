@@ -72,10 +72,17 @@ class MyScene extends Phaser.Scene {
         super({ key: 'my_scene' });
     }
 
+
     create() {
         // キャラクターを配置する
         this.player = new Character(this, 100, 100, "player", 0);
         this.enemy = new Character(this, 300, 100, "enemy", 0);
+
+        // テキストオブジェクトを作成する
+        this.narrationText = this.add.text(10, 10, "", {
+            fontSize: "32px",
+            fill: "#fff",
+        });
 
         // ターンを制御するタイマーを作成する
         this.turnTimer = this.time.addEvent({
@@ -130,10 +137,19 @@ class MyScene extends Phaser.Scene {
         // 現在のターンのキャラクターを取得する
         const currentCharacter = this[this.currentTurn];
 
+
+   
+        // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
+        this.narrationText.setText(`${currentCharacter.name}のターン`);
+
         // 現在のターンのキャラクターが行動できるか判定する
         if (currentCharacter.canAct()) {
-        // 行動できる場合、アクションを実行する
-    currentCharacter.act(event.keyCode);
+            // 行動できる場合、アクションを実行する
+            currentCharacter.act();
+        } else {
+            // 行動できない場合、次のターンへ進む
+             this.nextTurn();
+
         }
     }
 
