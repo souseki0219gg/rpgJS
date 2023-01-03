@@ -3,6 +3,8 @@ import Character from "./character.js";
 class BattleScene extends Phaser.Scene {
     constructor() {
         super({ key: 'battle_scene' });
+        // タイマー用の変数
+        this.totalTimeElapsed = 0;
     }
 
     // ロード前に呼ばれる関数
@@ -29,26 +31,25 @@ class BattleScene extends Phaser.Scene {
             fill: "#fff",
         });
 
-        // ターンを制御するタイマーを作成する
-        this.turnTimer = this.time.addEvent({
-            delay: 1000, // 1秒ごとにターンを切り替える
-            callback: this.nextTurn,
-            callbackScope: this,
-            loop: true,
-        });
-
         // 戦闘終了を判定するための変数を初期化する
         this.isBattleEnd = false;
     }
 
     // シーンがアップデートされるたびに呼ばれるメソッド
     update(time, delta) {
-        // キャラクター同士の衝突を判定する処理をここに記述する
-
         // 戦闘が終了している場合は処理を終了する
         if (this.isBattleEnd) {
             return;
         }
+
+        // ターンを実行する処理を記述する
+        this.totalTimeElapsed += delta;
+        if (this.totalTimeElapsed > 1000) {
+            this.handleTurn();
+            this.totalTimeElapsed = 0;
+        }
+
+        // キャラクター同士の衝突を判定する処理をここに記述する
 
         // プレイヤーのHPが0以下の場合、敵の勝利として戦闘を終了する
         if (this.player.hp <= 0) {
@@ -57,30 +58,32 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
+    // 1ターンの処理全体をするメソッド
+    handleTurn() {
+        this.nextTurn();
+        this.handleCharacterAct(this.currentCharacter);
+        this.endTurn();
+    }
+
     // 次のターンへ進むメソッド
     nextTurn() {
         // 現在のターンを切り替える
         this.currentTurn = this.currentTurn === "player" ? "enemy" : "player";
         
         // 現在のターンのキャラクターを取得する
-        const currentCharacter = this[this.currentTurn];
+        this.currentCharacter = this[this.currentTurn];
 
         // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
-        this.narrationText.setText(`${currentCharacter.name}のターン`);
-
-        this.handleTurn(currentCharacter);
+        this.narrationText.setText(`${this.currentCharacter.name}のターン`);
     }
 
     // ターンのメイン処理を行うメソッド
-    handleTurn(currentCharacter) {
-        // 現在のターンのキャラクターが行動できるか判定する
-        if (currentCharacter.canAct()) {
-            // 行動できる場合、アクションを実行する
-            currentCharacter.act();
-        } else {
-            // 行動できない場合、次のターンへ進む
-            this.nextTurn();
-        }
+    handleCharacterAct(currentCharacter) {
+        currentCharacter.act();
+    }
+
+    endTurn() {
+        console.log("ターン終了");
     }
 
     // 戦闘を終了するメソッド
