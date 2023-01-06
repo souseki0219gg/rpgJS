@@ -10,14 +10,19 @@ class Character extends Phaser.GameObjects.Sprite {
 
         // キャラクターをシーンに追加する
         scene.add.existing(this);
+
+        // ステータスを表示させる
+        this.hpIndicator = scene.add.text(x, y + 100, "初期のテキスト");
     }
 
     // キャラクターがダメージを受けるメソッド
     takeDamage(damage) {
         this.hp -= damage;
+        console.log(`${this.name}は${damage}ダメージくらった`);
         if (this.hp <= 0) {
             this.die();
         }
+        this.updateStatusIndicator();
     }
 
     // キャラクターが死亡するメソッド
@@ -33,7 +38,19 @@ class Character extends Phaser.GameObjects.Sprite {
 
     // キャラクターが行動するメソッド
     act() {
-        console.log(`${this.name}は行動した`);
+        if (this.canAct()) {
+            console.log(`${this.name}は行動した`);
+            // 攻撃対象のスプライトを取得
+            const target = this.scene.children.list.filter(sprite => (sprite.type === "Sprite") && (sprite.name !== this.name))[0];
+            target.takeDamage(this.attack);
+        } else {
+            console.log(`${this.name}は行動できなかった`);
+        }
+    }
+
+    // ステータス表示を更新するメソッド
+    updateStatusIndicator() {
+        this.hpIndicator.setText(this.hp);
     }
 }
 
