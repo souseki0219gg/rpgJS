@@ -8,12 +8,43 @@ class Character extends Phaser.GameObjects.Sprite {
         this.attack = status.attack || 10;
         this.defense = status.defense || 5;
 
+        // 行動スタックを保存するプロパティを追加する
+        this.actions = [];
+
+
         // キャラクターをシーンに追加する
         scene.add.existing(this);
 
         // ステータスを表示させる
         this.hpIndicator = scene.add.text(x, y + 100, "初期のテキスト");
     }
+
+
+     // 行動を追加するメソッド
+    addAction(action) {
+    this.actions.push(action);
+    }
+
+    // 行動を実行するメソッド
+    act() {
+
+        // 行動スタックからアクションを取り出す
+    const action = this.popAction();
+
+    // アクションを実行する
+    switch (action) {
+        case "attack":
+        this.attack();
+        break;
+        case "defend":
+        this.defend();
+        break;
+        case "useItem":
+        this.useItem();
+        break;
+        }
+    }
+
 
     // キャラクターがダメージを受けるメソッド
     takeDamage(damage) {
