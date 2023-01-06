@@ -30,6 +30,10 @@ class BattleScene extends Phaser.Scene {
             fontSize: "32px",
             fill: "#fff",
         });
+        this.commandText = this.add.text(10, 50, "", {
+            fontSize: "24px",
+            fill: "#fff",
+        });
 
         // 戦闘終了を判定するための変数を初期化する
         this.isBattleEnd = false;
@@ -75,19 +79,41 @@ class BattleScene extends Phaser.Scene {
 
         // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
         this.narrationText.setText(`${this.currentCharacter.name}のターン`);
-    }
+
+         // コマンドを入力する画面を表示する
+    this.commandText.setText("アクションを選択してください：攻撃、防御、アイテム");
+
+     // 入力されたコマンドを処理する
+    this.input.keyboard.on("keydown", (event)) ;{
+        switch (event.key) {
+          case "a": // 攻撃を選択した場合
+            currentCharacter.attack(this.enemy);
+            break;
+          case "d": // 防御を選択した場合
+            currentCharacter.defend();
+            break;
+          case "i": // アイテムを選択した場合
+            currentCharacter.useItem();
+            break;
+        }
+
+         // 次のターンへ進む
+    this.nextTurn();
+    };
+
+
 
     // ターンのメイン処理を行うメソッド
-    handleCharacterAct(currentCharacter) {
+    handleCharacterAct(currentCharacter) ;{
         currentCharacter.act();
     }
 
-    endTurn() {
+    endTurn() ;{
         console.log("ターン終了");
     }
 
     // 戦闘を終了するメソッド
-    endBattle(winner) {
+    endBattle(winner) ;{
         // 戦闘終了を判定する変数を更新する
         this.isBattleEnd = true;
 
@@ -95,7 +121,7 @@ class BattleScene extends Phaser.Scene {
         console.log(`${winner}の勝利！`);
         // シーンを遷移する
         this.scene.start("GameOverScene", { winner: winner });
+        }
     }
 }
-
 export default BattleScene;
