@@ -1,13 +1,16 @@
+import { DefaultCharacterStatus as DefaultStatus } from "../settings/character.js";
+
 class Character extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, frame, status = {}) {
         super(scene, x, y, texture, frame);
 
         // キャラクターのステータスを定義する
         this.status = {
-            name: status.name || "名無し",
-            hp: status.hp || 100,
-            attack: status.attack || 10,
-            defense: status.defense || 5,
+            name: status.name || DefaultStatus.name,
+            maxHp: status.maxHp || DefaultStatus.maxHp,
+            hp: status.hp || DefaultStatus.hp,
+            attack: status.attack || DefaultStatus.attack,
+            defense: status.defense || DefaultStatus.defense,
         };
 
         // 行動スタックを保存するプロパティ
@@ -30,8 +33,8 @@ class Character extends Phaser.GameObjects.Sprite {
     popAction() {
         const action = this.actions.pop();
         return action;
-    } 
-    
+    }
+
     // キャラクターがダメージを受けるメソッド
     takeDamage(damage) {
         this.status.hp -= damage;
@@ -59,7 +62,7 @@ class Character extends Phaser.GameObjects.Sprite {
     canAct(action) {
         return true;
     }
-    
+
     // 行動を実行するメソッド
     act() {
         // 行動スタックからアクションを取り出す
@@ -120,6 +123,16 @@ class Character extends Phaser.GameObjects.Sprite {
     updateStatusIndicator() {
         this.hpIndicator.setText(this.status.hp);
     }
+}
+
+class Player extends Character {
+    // 味方の定義をここで行う
+    // 味方特有の関数はここで定義する
+}
+
+class Enemy extends Character {
+    // 敵の定義をここで行う
+    // 敵特有の関数はここで定義する
 }
 
 export default Character;

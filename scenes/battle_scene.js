@@ -1,4 +1,5 @@
-import Character from "./character.js";
+import Character from "../models/character.js";
+import { getEnemyImagePath, getPlayerImagePath } from "../utils/get_path.js";
 
 class BattleScene extends Phaser.Scene {
     constructor() {
@@ -8,9 +9,9 @@ class BattleScene extends Phaser.Scene {
     }
 
     // ロード前に呼ばれる関数
-    preload () {
-        this.load.image("enemy", "src/enemy/mon_025r.png");
-        this.load.image("player", "src/player/mon_234r.png");
+    preload() {
+        this.load.image("enemy", getEnemyImagePath('mon_025r'));
+        this.load.image("player", getPlayerImagePath('mon_234r'));
     }
 
 
@@ -66,7 +67,7 @@ class BattleScene extends Phaser.Scene {
     nextTurn() {
         // 現在のターンを切り替える
         this.currentTurn = this.currentTurn === "player" ? "enemy" : "player";
-        
+
         // 現在のターンのキャラクターを取得する
         this.currentCharacter = this[this.currentTurn];
 

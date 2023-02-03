@@ -1,4 +1,4 @@
-import BattleScene from "./battle_scene.js";
+import BattleScene from "./scenes/battle_scene.js";
 
 const canvasWidth = 400;
 const canvasHeight = 700;
@@ -25,15 +25,15 @@ function initGame() {
 }
 
 // ロード前に呼ばれる関数
-function preload () {
+function preload() {
     this.scene.add('battle_scene', BattleScene);
 }
 
 // 作成時に呼ばれる関数
-function create () {
+function create() {
     const startButton = this.add.rectangle(canvasWidth / 2, 500, 150, 70, 44000000);
     const startText = this.add.text(canvasWidth / 2, 500, "スタート", { fontSize: "24px" })
-    .setOrigin(0.5);
+        .setOrigin(0.5);
     startButton.setInteractive();
     startButton.on('pointerdown', () => {
         // ゲームを開始する
@@ -42,7 +42,7 @@ function create () {
 }
 
 // フレームごとに呼ばれる関数
-function update () {
+function update() {
 }
 
 document.addEventListener("DOMContentLoaded", initGame);
