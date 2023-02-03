@@ -1,4 +1,4 @@
-import { DefaultCharacterStatus as DefaultStatus } from "../settings/character";
+import { DefaultCharacterStatus as DefaultStatus } from "../settings/character.js";
 
 class Character extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, frame, status = {}) {

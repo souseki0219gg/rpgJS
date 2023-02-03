@@ -1,4 +1,5 @@
 import Character from "../models/character.js";
+import { getEnemyImagePath, getPlayerImagePath } from "../utils/get_path.js";
 
 class BattleScene extends Phaser.Scene {
     constructor() {
@@ -9,8 +10,8 @@ class BattleScene extends Phaser.Scene {
 
     // ロード前に呼ばれる関数
     preload() {
-        this.load.image("enemy", "images/enemy/mon_025r.png");
-        this.load.image("player", "images/player/mon_234r.png");
+        this.load.image("enemy", getEnemyImagePath('mon_025r'));
+        this.load.image("player", getPlayerImagePath('mon_234r'));
     }
 
 

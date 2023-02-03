@@ -1,4 +1,4 @@
-import { Floor } from "./floor";
+import { Floor } from "./floor.js";
 
 export class Labyrinth {
     constructor(config) {
