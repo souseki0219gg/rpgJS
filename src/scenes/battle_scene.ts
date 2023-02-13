@@ -1,6 +1,8 @@
 import Action, { Actions } from "../models/action";
 import Character from "../models/character";
 import { getEnemyImagePath, getPlayerImagePath } from "../utils/get_path";
+import waitUntil from "../utils/wait_until";
+import Narrator from "../models/narrator";
 
 class BattleScene extends Phaser.Scene {
     private totalTimeElapsed: integer;
@@ -8,7 +10,8 @@ class BattleScene extends Phaser.Scene {
     private enemy?: Character;
     private waitingForCommand: boolean;
     private isBattleEnd: boolean;
-    private narrationText?: Phaser.GameObjects.Text;
+    private isHandlingTurn: boolean;
+    public narrator?: Narrator;
     private commandText?: Phaser.GameObjects.Text;
     private currentCharacter?: Character;
     private currentTurn: "player" | "enemy" | "else";
@@ -18,6 +21,7 @@ class BattleScene extends Phaser.Scene {
         // タイマー用の変数
         this.totalTimeElapsed = 0;
         this.waitingForCommand = false;
+        this.isHandlingTurn = false;
         // 戦闘終了を判定するための変数を初期化する
         this.isBattleEnd = false;
         this.currentTurn = "else";
@@ -40,20 +44,59 @@ class BattleScene extends Phaser.Scene {
             name: "enemy",
             hp: 1000,
         });
-
-        // テキストオブジェクトを作成する
-        this.narrationText = this.add.text(10, 10, "", {
-            fontSize: "32px",
-            stroke: "#fff",
-        });
+        // ナレーションオブジェクトを作成する
+        this.narrator = new Narrator(this, 10, 490, "narrator", 0, "ナレーターの初期文字列");
         this.commandText = this.add.text(10, 50, "", {
             fontSize: "24px",
             stroke: "#fff",
         });
+
+        // コマンドが入力されたときのリスナーを定義
+        this.input.keyboard.on("keydown", (event: KeyboardEvent) => {
+            if (this.waitingForCommand) {
+                switch (event.key) {
+                    case "a":
+                        // 攻撃を選択した場合
+                        this.currentCharacter?.addAction(
+                            Action.from({
+                                type: Actions.attack,
+                                character: this.currentCharacter,
+                                target: this.enemy!,
+                            })
+                        );
+                        this.waitingForCommand = false;
+                        break;
+                    case "d":
+                        // 防御を選択した場合
+                        this.currentCharacter?.addAction(
+                            Action.from({
+                                type: Actions.defend,
+                                character: this.currentCharacter,
+                                target: this.enemy!,
+                            })
+                        );
+                        this.waitingForCommand = false;
+                        break;
+                    case "i":
+                        // アイテムを選択した場合
+                        this.currentCharacter?.addAction(
+                            Action.from({
+                                type: Actions.useItem,
+                                character: this.currentCharacter,
+                                target: this.currentCharacter
+                            })
+                        );
+                        this.waitingForCommand = false;
+                        break;
+                    default:
+                        console.log('a, d, iのうちいずれかのキーを選択してください。')
+                }
+            }
+        });
     }
 
     // シーンがアップデートされるたびに呼ばれるメソッド
-    update(time: number, delta: number) {
+    override update(time: number, delta: number) {
         // 戦闘が終了している場合は処理を終了する
         if (this.isBattleEnd) {
             return;
@@ -68,15 +111,19 @@ class BattleScene extends Phaser.Scene {
     }
 
     // 1ターンの処理全体をするメソッド
-    handleTurn() {
-        this.nextTurn();
-        this.determineAction(this.currentCharacter!);
-        this.handleCharacterAct(this.currentCharacter!);
-        this.endTurn();
+    async handleTurn() {
+        if (!this.isHandlingTurn) {
+            this.beginTurn();
+            await this.determineAction(this.currentCharacter!);
+            this.handleCharacterAct(this.currentCharacter!);
+            this.endTurn();
+        }
     }
 
     // 次のターンへ進むメソッド
-    nextTurn() {
+    beginTurn() {
+        this.isHandlingTurn = true;
+
         // 現在のターンを切り替える
         this.currentTurn = this.currentTurn === "player" ? "enemy" : "player";
 
@@ -84,11 +131,11 @@ class BattleScene extends Phaser.Scene {
         this.currentCharacter = this[this.currentTurn];
 
         // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
-        this.narrationText?.setText(`${this.currentCharacter!.status.name}のターン`);
+        this.narrator?.addText(`${this.currentCharacter!.status.name}のターン`);
     }
 
     // コマンドで行動を選択するメソッド
-    determineAction(currentCharacter: Character) {
+    async determineAction(currentCharacter: Character) {
         if (currentCharacter == this.player) {
             // プレイヤーの場合
             // コマンドを入力する画面を表示する
@@ -96,51 +143,8 @@ class BattleScene extends Phaser.Scene {
 
             this.waitingForCommand = true;
 
-            // コマンドが入力されたときのリスナーを定義
-            this.input.keyboard.once("keydown", (event: KeyboardEvent) => {
-                if (this.waitingForCommand) {
-                    switch (event.key) {
-                        case "a":
-                            // 攻撃を選択した場合
-                            currentCharacter.addAction(
-                                Action.from({
-                                    type: Actions.attack,
-                                    character: currentCharacter,
-                                    target: this.enemy!,
-                                })
-                            );
-                            this.waitingForCommand = false;
-                            break;
-                        case "d":
-                            // 防御を選択した場合
-                            currentCharacter.addAction(
-                                Action.from({
-                                    type: Actions.defend,
-                                    character: currentCharacter,
-                                    target: this.enemy!,
-                                })
-                            );
-                            this.waitingForCommand = false;
-                            break;
-                        case "i":
-                            // アイテムを選択した場合
-                            currentCharacter.addAction(
-                                Action.from({
-                                    type: Actions.useItem,
-                                    character: currentCharacter,
-                                    target: currentCharacter
-                                })
-                            );
-                            this.waitingForCommand = false;
-                            break;
-                        default:
-                            console.log('a, d, iのうちいずれかのキーを選択してください。')
-                    }
-                }
-            });
-
             // コマンド入力が完了するまで待つ
-            // 未記述
+            await waitUntil(() => !this.waitingForCommand)
 
         } else {
             // 敵の場合
@@ -148,7 +152,7 @@ class BattleScene extends Phaser.Scene {
                 Action.from({
                     type: Actions.attack,
                     character: currentCharacter,
-                    target: this.enemy!,
+                    target: this.player!,
                 })
             );
         }
@@ -171,6 +175,7 @@ class BattleScene extends Phaser.Scene {
         }
 
         console.log("ターン終了");
+        this.isHandlingTurn = false;
     }
 
     // 戦闘を終了するメソッド

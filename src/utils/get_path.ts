@@ -1,6 +1,3 @@
-import "../assets/images/enemy/mon_025r.png";
-import "../assets/images/player/mon_234r.png";
-
 import { imageAssetPath } from "../constants/system";
 
 export const getEnemyImagePath = (name: String, extension: String = "png") => {
@@ -8,5 +5,5 @@ export const getEnemyImagePath = (name: String, extension: String = "png") => {
 }
 
 export const getPlayerImagePath = (name: String, extension: String = "png") => {
-    return `${imageAssetPath}/player/${name}.${extension}`
+    return `${imageAssetPath}/player/${name}.${extension}`;
 }

@@ -1,5 +1,8 @@
 import { DefaultCharacterStatus as DefaultStatus } from "../constants/character";
+import BattleScene from "../scenes/battle_scene";
 import Action, { Actions } from "./action";
+import narrate from "../utils/narrate";
+import { formatHp } from "../utils/format";
 
 type CharacterStatusInitArgs = {
     name?: string,
@@ -23,7 +26,7 @@ class Character extends Phaser.GameObjects.Sprite {
     private hpIndicator: Phaser.GameObjects.Text;
 
     constructor(
-        scene: Phaser.Scene,
+        scene: BattleScene,
         x: number,
         y: number,
         texture: string | Phaser.Textures.Texture,
@@ -48,7 +51,7 @@ class Character extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
 
         // ステータスを表示させる
-        this.hpIndicator = scene.add.text(x, y + 100, "初期のテキスト");
+        this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.status.maxHp));
     }
 
     // 行動を追加するメソッド
@@ -65,7 +68,7 @@ class Character extends Phaser.GameObjects.Sprite {
     // キャラクターがダメージを受けるメソッド
     takeDamage(damage: integer) {
         this.status.hp -= damage;
-        console.log(`${this.status.name}は${damage}ダメージくらった`);
+        narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
         if (this.isDead()) {
             this.die();
         }
@@ -80,13 +83,13 @@ class Character extends Phaser.GameObjects.Sprite {
     // キャラクターが死亡するメソッド
     die() {
         // キャラクターを削除する処理をここに記述する
-        console.log(`${this.status.name}は死亡した`);
+        narrate(this.scene, `${this.status.name}は死亡した`);
     }
 
     // キャラクターが回復するメソッド
     restoreHealth(amount: integer) {
         this.status.hp += amount;
-        console.log(`${this.status.name}の体力が${amount}回復した`);
+        narrate(this.scene, `${this.status.name}の体力が${amount}回復した`);
         this.updateStatusIndicator();
     }
 
@@ -101,13 +104,13 @@ class Character extends Phaser.GameObjects.Sprite {
         const action = this.popAction();
 
         if (action == null) {
-            console.log(`${this.status.name}は行動スタックがないので行動できない!`);
+            narrate(this.scene, `${this.status.name}は行動スタックがないので行動できない!`);
         } else if (this.canAct(action)) {
-            console.log(`${this.status.name}は行動した`);
+            narrate(this.scene, `${this.status.name}は行動した`);
             // アクションを実行する
             switch (action.type) {
                 case Actions.attack:
-                    this.attack();
+                    this.attack(action.target);
                     break;
                 case Actions.defend:
                     this.defend();
@@ -117,45 +120,45 @@ class Character extends Phaser.GameObjects.Sprite {
                     break;
                 default:
                     // 想定されていない値が来た場合の処理はここに書く
-                    console.log('想定されていない行動が入力されています');
+                    narrate(this.scene, '想定されていない行動が入力されています');
             }
         } else {
-            console.log(`${this.status.name}は行動できなかった`);
+            narrate(this.scene, `${this.status.name}は行動できなかった`);
         }
 
         // キャラ行動終了時の共通処理はここに書く
     }
 
     // キャラが攻撃するメソッド
-    attack() {
-        // 攻撃対象のスプライトを取得（ここでは自分と名前が違う最初のスプライトを取得している）
-        const target = this.scene.children.list.filter(
-            sprite => (sprite instanceof Character) && (sprite.status.name !== this.status.name)
-        )[0] as Character;
-        target.takeDamage(this.status.attack);
+    attack(target: Character | Character[]) {
+        if (target instanceof Character) {
+            target.takeDamage(this.status.attack);
+        } else {
+            target[0].takeDamage(this.status.attack);
+        }
     }
 
     // キャラが防御するメソッド
     defend() {
-        console.log(`${this.status.name}は防御している`);
+        narrate(this.scene, `${this.status.name}は防御している`);
     }
 
     // キャラがアイテムを使うメソッド
     useItem() {
         const itemId = 1;
-        console.log(`${this.status.name}はアイテムを使った!`);
+        narrate(this.scene, `${this.status.name}はアイテムを使った!`);
         switch (itemId) {
             case 1:
                 this.restoreHealth(100);
                 break;
             default:
-                console.log('しかし、何も起こらなかった');
+                narrate(this.scene, 'しかし、何も起こらなかった');
         }
     }
 
     // ステータス表示を更新するメソッド
     updateStatusIndicator() {
-        this.hpIndicator.setText(this.status.hp as unknown as string);
+        this.hpIndicator.setText(formatHp(this.status.hp, this.status.maxHp));
     }
 }
 
