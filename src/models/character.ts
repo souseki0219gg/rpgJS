@@ -24,6 +24,7 @@ class Character extends Phaser.GameObjects.Sprite {
     public status: CharacterStatus;
     public actions: Array<Action>;
     private hpIndicator: Phaser.GameObjects.Text;
+    scene: BattleScene;
 
     constructor(
         scene: BattleScene,
@@ -34,6 +35,7 @@ class Character extends Phaser.GameObjects.Sprite {
         status: CharacterStatusInitArgs = {}
     ) {
         super(scene, x, y, texture, frame);
+        this.scene = scene;
 
         // キャラクターのステータスを定義する
         this.status = {
@@ -66,9 +68,9 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // キャラクターがダメージを受けるメソッド
-    takeDamage(damage: integer) {
+    async takeDamage(damage: integer) {
         this.status.hp -= damage;
-        narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
+        await narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
         if (this.isDead()) {
             this.die();
         }
@@ -81,16 +83,22 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // キャラクターが死亡するメソッド
-    die() {
+    async die() {
         // キャラクターを削除する処理をここに記述する
-        narrate(this.scene, `${this.status.name}は死亡した`);
+        await narrate(this.scene, `${this.status.name}は死亡した`);
     }
 
     // キャラクターが回復するメソッド
-    restoreHealth(amount: integer) {
+    async restoreHealth(amount: integer, exceedMax: boolean = false) {
+        let startHp = this.status.hp;
         this.status.hp += amount;
-        narrate(this.scene, `${this.status.name}の体力が${amount}回復した`);
+        if (!exceedMax && this.status.hp > this.status.maxHp) {
+            this.status.hp = this.status.maxHp;
+        }
+        let diff = this.status.hp - startHp;
+        await narrate(this.scene, `${this.status.name}の体力が${diff}回復した`);
         this.updateStatusIndicator();
+        return diff;
     }
 
     //キャラクターが行動可能か判定するメソッド
@@ -99,60 +107,60 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // 行動を実行するメソッド
-    act() {
+    async act() {
         // 行動スタックからアクションを取り出す
         const action = this.popAction();
 
         if (action == null) {
-            narrate(this.scene, `${this.status.name}は行動スタックがないので行動できない!`);
+            await narrate(this.scene, `${this.status.name}は行動スタックがないので行動できない!`);
         } else if (this.canAct(action)) {
-            narrate(this.scene, `${this.status.name}は行動した`);
+            await narrate(this.scene, `${this.status.name}は行動した`);
             // アクションを実行する
             switch (action.type) {
                 case Actions.attack:
-                    this.attack(action.target);
+                    await this.attack(action.target);
                     break;
                 case Actions.defend:
-                    this.defend();
+                    await this.defend();
                     break;
                 case Actions.useItem:
-                    this.useItem();
+                    await this.useItem();
                     break;
                 default:
                     // 想定されていない値が来た場合の処理はここに書く
-                    narrate(this.scene, '想定されていない行動が入力されています');
+                    await narrate(this.scene, '想定されていない行動が入力されています');
             }
         } else {
-            narrate(this.scene, `${this.status.name}は行動できなかった`);
+            await narrate(this.scene, `${this.status.name}は行動できなかった`);
         }
 
         // キャラ行動終了時の共通処理はここに書く
     }
 
     // キャラが攻撃するメソッド
-    attack(target: Character | Character[]) {
+    async attack(target: Character | Character[]) {
         if (target instanceof Character) {
-            target.takeDamage(this.status.attack);
+            await target.takeDamage(this.status.attack);
         } else {
-            target[0].takeDamage(this.status.attack);
+            await target[0].takeDamage(this.status.attack);
         }
     }
 
     // キャラが防御するメソッド
-    defend() {
-        narrate(this.scene, `${this.status.name}は防御している`);
+    async defend() {
+        await narrate(this.scene, `${this.status.name}は防御している`);
     }
 
     // キャラがアイテムを使うメソッド
-    useItem() {
+    async useItem() {
         const itemId = 1;
-        narrate(this.scene, `${this.status.name}はアイテムを使った!`);
+        await narrate(this.scene, `${this.status.name}はアイテムを使った!`);
         switch (itemId) {
             case 1:
-                this.restoreHealth(100);
+                await this.restoreHealth(100);
                 break;
             default:
-                narrate(this.scene, 'しかし、何も起こらなかった');
+                await narrate(this.scene, 'しかし、何も起こらなかった');
         }
     }
 

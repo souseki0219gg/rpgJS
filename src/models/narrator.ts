@@ -1,3 +1,5 @@
+import { isDebugMode, narratorInterval } from "../constants/game";
+
 export default class Narrator extends Phaser.GameObjects.Sprite {
   private narrationText: Phaser.GameObjects.Text;
   public texts: Array<string>;
@@ -28,24 +30,26 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
     this.scene.events.addListener(
       "narrate",
       (text: string) => {
-        console.log("narrateイベントを受け取りました");
         this.addText(text);
       }
     )
 
     this.timer = setInterval(() => {
       this.proceed();
-    }, 500);
+      if (isDebugMode) {
+        console.log("初期のインターバルコールバック関数が実行されました");
+      }
+    }, narratorInterval);
   }
 
   addText(text: string) {
     if (this.texts.length == 0) {
-      clearInterval(this.timer);
       this.timer = setInterval(() => {
         this.proceed();
-      }, 500);
+      }, narratorInterval);
     }
     this.texts.push(text);
+    this.narrationText.setText(this.texts[0]);
   }
 
   // 次の文字列に進めるメソッド
@@ -55,5 +59,13 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
       this.narrationText.setText(this.texts[0]);
       console.log(this.texts);
     }
+    if (this.texts?.length == 0) {
+      clearInterval(this.timer);
+    }
+  }
+
+  // ナレーターがアクティブか確認するメソッド
+  isNarrating() {
+    return this.texts.length > 0
   }
 }

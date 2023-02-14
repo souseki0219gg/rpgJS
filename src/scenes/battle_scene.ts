@@ -3,9 +3,9 @@ import Character from "../models/character";
 import { getEnemyImagePath, getPlayerImagePath } from "../utils/get_path";
 import waitUntil from "../utils/wait_until";
 import Narrator from "../models/narrator";
+import narrate from "../utils/narrate";
 
 class BattleScene extends Phaser.Scene {
-    private totalTimeElapsed: integer;
     private player?: Character;
     private enemy?: Character;
     private waitingForCommand: boolean;
@@ -18,8 +18,6 @@ class BattleScene extends Phaser.Scene {
 
     constructor() {
         super({ key: 'battle_scene' });
-        // タイマー用の変数
-        this.totalTimeElapsed = 0;
         this.waitingForCommand = false;
         this.isHandlingTurn = false;
         // 戦闘終了を判定するための変数を初期化する
@@ -102,26 +100,23 @@ class BattleScene extends Phaser.Scene {
             return;
         }
 
-        // 1秒ごとにターンを実行している
-        this.totalTimeElapsed += delta;
-        if (this.totalTimeElapsed > 1000) {
+        if (!this.isHandlingTurn) {
             this.handleTurn();
-            this.totalTimeElapsed = 0;
         }
     }
 
     // 1ターンの処理全体をするメソッド
     async handleTurn() {
         if (!this.isHandlingTurn) {
-            this.beginTurn();
+            await this.beginTurn();
             await this.determineAction(this.currentCharacter!);
-            this.handleCharacterAct(this.currentCharacter!);
+            await this.handleCharacterAct(this.currentCharacter!);
             this.endTurn();
         }
     }
 
     // 次のターンへ進むメソッド
-    beginTurn() {
+    async beginTurn() {
         this.isHandlingTurn = true;
 
         // 現在のターンを切り替える
@@ -131,7 +126,7 @@ class BattleScene extends Phaser.Scene {
         this.currentCharacter = this[this.currentTurn];
 
         // テキストオブジェクトに、現在のターンのキャラクターの名前を表示する
-        this.narrator?.addText(`${this.currentCharacter!.status.name}のターン`);
+        await narrate(this, `${this.currentCharacter!.status.name}のターン`);
     }
 
     // コマンドで行動を選択するメソッド
@@ -144,7 +139,9 @@ class BattleScene extends Phaser.Scene {
             this.waitingForCommand = true;
 
             // コマンド入力が完了するまで待つ
-            await waitUntil(() => !this.waitingForCommand)
+            await waitUntil(() => !this.waitingForCommand);
+
+            this.commandText?.setText("");
 
         } else {
             // 敵の場合
@@ -160,8 +157,8 @@ class BattleScene extends Phaser.Scene {
 
 
     // ターンのメイン処理を行うメソッド
-    handleCharacterAct(currentCharacter: Character) {
-        currentCharacter.act();
+    async handleCharacterAct(currentCharacter: Character) {
+        await currentCharacter.act();
     }
 
     endTurn() {
@@ -174,7 +171,7 @@ class BattleScene extends Phaser.Scene {
             return;
         }
 
-        console.log("ターン終了");
+        narrate(this, "ターン終了");
         this.isHandlingTurn = false;
     }
 
