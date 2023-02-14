@@ -1,5 +1,8 @@
 import { DefaultCharacterStatus as DefaultStatus } from "../constants/character";
+import BattleScene from "../scenes/battle_scene";
 import Action, { Actions } from "./action";
+import narrate from "../utils/narrate";
+import { formatHp } from "../utils/format";
 
 type CharacterStatusInitArgs = {
     name?: string,
@@ -21,9 +24,10 @@ class Character extends Phaser.GameObjects.Sprite {
     public status: CharacterStatus;
     public actions: Array<Action>;
     private hpIndicator: Phaser.GameObjects.Text;
+    scene: BattleScene;
 
     constructor(
-        scene: Phaser.Scene,
+        scene: BattleScene,
         x: number,
         y: number,
         texture: string | Phaser.Textures.Texture,
@@ -31,6 +35,7 @@ class Character extends Phaser.GameObjects.Sprite {
         status: CharacterStatusInitArgs = {}
     ) {
         super(scene, x, y, texture, frame);
+        this.scene = scene;
 
         // キャラクターのステータスを定義する
         this.status = {
@@ -48,7 +53,7 @@ class Character extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
 
         // ステータスを表示させる
-        this.hpIndicator = scene.add.text(x, y + 100, "初期のテキスト");
+        this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.status.maxHp));
     }
 
     // 行動を追加するメソッド
@@ -63,9 +68,9 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // キャラクターがダメージを受けるメソッド
-    takeDamage(damage: integer) {
+    async takeDamage(damage: integer) {
         this.status.hp -= damage;
-        console.log(`${this.status.name}は${damage}ダメージくらった`);
+        await narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
         if (this.isDead()) {
             this.die();
         }
@@ -78,16 +83,22 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // キャラクターが死亡するメソッド
-    die() {
+    async die() {
         // キャラクターを削除する処理をここに記述する
-        console.log(`${this.status.name}は死亡した`);
+        await narrate(this.scene, `${this.status.name}は死亡した`);
     }
 
     // キャラクターが回復するメソッド
-    restoreHealth(amount: integer) {
+    async restoreHealth(amount: integer, exceedMax: boolean = false) {
+        let startHp = this.status.hp;
         this.status.hp += amount;
-        console.log(`${this.status.name}の体力が${amount}回復した`);
+        if (!exceedMax && this.status.hp > this.status.maxHp) {
+            this.status.hp = this.status.maxHp;
+        }
+        let diff = this.status.hp - startHp;
+        await narrate(this.scene, `${this.status.name}の体力が${diff}回復した`);
         this.updateStatusIndicator();
+        return diff;
     }
 
     //キャラクターが行動可能か判定するメソッド
@@ -96,66 +107,66 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // 行動を実行するメソッド
-    act() {
+    async act() {
         // 行動スタックからアクションを取り出す
         const action = this.popAction();
 
         if (action == null) {
-            console.log(`${this.status.name}は行動スタックがないので行動できない!`);
+            await narrate(this.scene, `${this.status.name}は行動スタックがないので行動できない!`);
         } else if (this.canAct(action)) {
-            console.log(`${this.status.name}は行動した`);
+            await narrate(this.scene, `${this.status.name}は行動した`);
             // アクションを実行する
             switch (action.type) {
                 case Actions.attack:
-                    this.attack();
+                    await this.attack(action.target);
                     break;
                 case Actions.defend:
-                    this.defend();
+                    await this.defend();
                     break;
                 case Actions.useItem:
-                    this.useItem();
+                    await this.useItem();
                     break;
                 default:
                     // 想定されていない値が来た場合の処理はここに書く
-                    console.log('想定されていない行動が入力されています');
+                    await narrate(this.scene, '想定されていない行動が入力されています');
             }
         } else {
-            console.log(`${this.status.name}は行動できなかった`);
+            await narrate(this.scene, `${this.status.name}は行動できなかった`);
         }
 
         // キャラ行動終了時の共通処理はここに書く
     }
 
     // キャラが攻撃するメソッド
-    attack() {
-        // 攻撃対象のスプライトを取得（ここでは自分と名前が違う最初のスプライトを取得している）
-        const target = this.scene.children.list.filter(
-            sprite => (sprite instanceof Character) && (sprite.status.name !== this.status.name)
-        )[0] as Character;
-        target.takeDamage(this.status.attack);
+    async attack(target: Character | Character[]) {
+        if (target instanceof Character) {
+            await target.takeDamage(this.status.attack);
+        } else {
+            await target[0].takeDamage(this.status.attack);
+        }
     }
 
     // キャラが防御するメソッド
-    defend() {
-        console.log(`${this.status.name}は防御している`);
+    async defend() {
+        await narrate(this.scene, `${this.status.name}は防御している`);
     }
 
     // キャラがアイテムを使うメソッド
-    useItem() {
+    async useItem() {
         const itemId = 1;
-        console.log(`${this.status.name}はアイテムを使った!`);
+        await narrate(this.scene, `${this.status.name}はアイテムを使った!`);
         switch (itemId) {
             case 1:
-                this.restoreHealth(100);
+                await this.restoreHealth(100);
                 break;
             default:
-                console.log('しかし、何も起こらなかった');
+                await narrate(this.scene, 'しかし、何も起こらなかった');
         }
     }
 
     // ステータス表示を更新するメソッド
     updateStatusIndicator() {
-        this.hpIndicator.setText(this.status.hp as unknown as string);
+        this.hpIndicator.setText(formatHp(this.status.hp, this.status.maxHp));
     }
 }
 
