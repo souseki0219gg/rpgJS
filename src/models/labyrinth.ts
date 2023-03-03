@@ -1,4 +1,4 @@
-import { Floor } from "./floor.js";
+import { Floor } from "./floor";
 
 type LabyrinthInitArgs = {
     name?: string,

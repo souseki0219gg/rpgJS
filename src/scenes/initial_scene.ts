@@ -1,15 +1,15 @@
 import BattleScene from "./battle_scene";
-import { canvasHeight, canvasWidth } from "../constants/game";
+import { canvasHeight, canvasWidth, SceneKeys } from "../constants/game";
 
 export default class initialScene extends Phaser.Scene {
 
   constructor() {
-    super({ key: "initial_scene" });
+    super({ key: SceneKeys.initialSceneKey });
   }
 
   // ロード前に呼ばれる関数
   preload() {
-    this.scene.add('battle_scene', BattleScene);
+    this.scene.add(SceneKeys.battleSceneKey, BattleScene);
   }
 
   // 作成時に呼ばれる関数
@@ -20,7 +20,7 @@ export default class initialScene extends Phaser.Scene {
     startButton.setInteractive();
     startButton.on('pointerdown', () => {
       // ゲームを開始する
-      this.scene.start('battle_scene');
+      this.scene.start(SceneKeys.battleSceneKey);
     })
   }
 

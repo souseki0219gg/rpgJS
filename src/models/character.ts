@@ -1,8 +1,10 @@
 import { DefaultCharacterStatus as DefaultStatus } from "../constants/character";
 import BattleScene from "../scenes/battle_scene";
-import Action, { Actions } from "./action";
+import Action, { Actions, AttackData, TargetType } from "./action";
 import narrate from "../utils/narrate";
 import { formatHp } from "../utils/format";
+import ActionCard from "./action_card";
+import { TextureKeys } from "../constants/game";
 
 type CharacterStatusInitArgs = {
     name?: string,
@@ -22,7 +24,7 @@ type CharacterStatus = {
 
 class Character extends Phaser.GameObjects.Sprite {
     public status: CharacterStatus;
-    public actions: Array<Action>;
+    public cards: [ActionCard, ActionCard, ActionCard, ActionCard, ActionCard];
     private hpIndicator: Phaser.GameObjects.Text;
     scene: BattleScene;
 
@@ -32,10 +34,10 @@ class Character extends Phaser.GameObjects.Sprite {
         y: number,
         texture: string | Phaser.Textures.Texture,
         frame?: string | number | undefined,
-        status: CharacterStatusInitArgs = {}
+        status: CharacterStatusInitArgs = {},
     ) {
         super(scene, x, y, texture, frame);
-        this.scene = scene;
+        this.scene = scene; // 型変換のため
 
         // キャラクターのステータスを定義する
         this.status = {
@@ -46,8 +48,96 @@ class Character extends Phaser.GameObjects.Sprite {
             defense: status.defense || DefaultStatus.defense,
         };
 
-        // 行動スタックを保存するプロパティ
-        this.actions = [];
+        const cardViewable = this instanceof Player;
+
+        // 技カードを保存するプロパティ
+        this.cards = [
+            new ActionCard(
+                scene,
+                0,
+                500,
+                TextureKeys.actionCardKeys[0],
+                {
+                    action: new Action({
+                        type: Actions.attack,
+                        character: this,
+                        targetType: TargetType.opponent,
+                        data: new AttackData(),
+                    }),
+                    name: "攻撃",
+                    recharge: 800,
+                    viewable: cardViewable,
+                },
+            ),
+            new ActionCard(
+                scene,
+                80,
+                500,
+                TextureKeys.actionCardKeys[1],
+                {
+                    action: new Action({
+                        type: Actions.attack,
+                        character: this,
+                        targetType: TargetType.opponent,
+                        data: new AttackData(),
+                    }),
+                    name: "攻撃",
+                    recharge: 1000,
+                    viewable: cardViewable,
+                },
+            ),
+            new ActionCard(
+                scene,
+                160,
+                500,
+                TextureKeys.actionCardKeys[2],
+                {
+                    action: new Action({
+                        type: Actions.attack,
+                        character: this,
+                        targetType: TargetType.opponent,
+                        data: new AttackData(),
+                    }),
+                    name: "攻撃",
+                    recharge: 2000,
+                    viewable: cardViewable,
+                },
+            ),
+            new ActionCard(
+                scene,
+                240,
+                500,
+                TextureKeys.actionCardKeys[3],
+                {
+                    action: new Action({
+                        type: Actions.attack,
+                        character: this,
+                        targetType: TargetType.opponent,
+                        data: new AttackData(),
+                    }),
+                    name: "攻撃",
+                    recharge: 3000,
+                    viewable: cardViewable,
+                },
+            ),
+            new ActionCard(
+                scene,
+                320,
+                500,
+                TextureKeys.actionCardKeys[4],
+                {
+                    action: new Action({
+                        type: Actions.attack,
+                        character: this,
+                        targetType: TargetType.opponent,
+                        data: new AttackData(),
+                    }),
+                    name: "攻撃",
+                    recharge: 4000,
+                    viewable: cardViewable,
+                },
+            ),
+        ];
 
         // キャラクターをシーンに追加する
         scene.add.existing(this);
@@ -56,29 +146,18 @@ class Character extends Phaser.GameObjects.Sprite {
         this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.status.maxHp));
     }
 
-    // 行動を追加するメソッド
-    addAction(action: Action) {
-        this.actions.push(action);
-    }
-
-    // 行動を取り出すメソッド
-    popAction() {
-        const action = this.actions.pop();
-        return action;
-    }
-
     // キャラクターがダメージを受けるメソッド
     async takeDamage(damage: integer) {
         this.status.hp -= damage;
+        this.updateStatusIndicator();
         await narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
-        if (this.isDead()) {
+        if (this.isDead) {
             this.die();
         }
-        this.updateStatusIndicator();
     }
 
     // キャラクターが死亡しているか確認するメソッド
-    isDead() {
+    get isDead() {
         return this.status.hp <= 0;
     }
 
@@ -101,81 +180,18 @@ class Character extends Phaser.GameObjects.Sprite {
         return diff;
     }
 
-    //キャラクターが行動可能か判定するメソッド
-    canAct(action: Action) {
-        return true;
-    }
-
-    // 行動を実行するメソッド
-    async act() {
-        // 行動スタックからアクションを取り出す
-        const action = this.popAction();
-
-        if (action == null) {
-            await narrate(this.scene, `${this.status.name}は行動スタックがないので行動できない!`);
-        } else if (this.canAct(action)) {
-            await narrate(this.scene, `${this.status.name}は行動した`);
-            // アクションを実行する
-            switch (action.type) {
-                case Actions.attack:
-                    await this.attack(action.target);
-                    break;
-                case Actions.defend:
-                    await this.defend();
-                    break;
-                case Actions.useItem:
-                    await this.useItem();
-                    break;
-                default:
-                    // 想定されていない値が来た場合の処理はここに書く
-                    await narrate(this.scene, '想定されていない行動が入力されています');
-            }
-        } else {
-            await narrate(this.scene, `${this.status.name}は行動できなかった`);
-        }
-
-        // キャラ行動終了時の共通処理はここに書く
-    }
-
-    // キャラが攻撃するメソッド
-    async attack(target: Character | Character[]) {
-        if (target instanceof Character) {
-            await target.takeDamage(this.status.attack);
-        } else {
-            await target[0].takeDamage(this.status.attack);
-        }
-    }
-
-    // キャラが防御するメソッド
-    async defend() {
-        await narrate(this.scene, `${this.status.name}は防御している`);
-    }
-
-    // キャラがアイテムを使うメソッド
-    async useItem() {
-        const itemId = 1;
-        await narrate(this.scene, `${this.status.name}はアイテムを使った!`);
-        switch (itemId) {
-            case 1:
-                await this.restoreHealth(100);
-                break;
-            default:
-                await narrate(this.scene, 'しかし、何も起こらなかった');
-        }
-    }
-
     // ステータス表示を更新するメソッド
     updateStatusIndicator() {
         this.hpIndicator.setText(formatHp(this.status.hp, this.status.maxHp));
     }
 }
 
-class Player extends Character {
+export class Player extends Character {
     // 味方の定義をここで行う
     // 味方特有の関数はここで定義する
 }
 
-class Enemy extends Character {
+export class Enemy extends Character {
     // 敵の定義をここで行う
     // 敵特有の関数はここで定義する
 }
