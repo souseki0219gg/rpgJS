@@ -1,9 +1,17 @@
 import { imageAssetPath } from "../constants/system";
 
-export const getEnemyImagePath = (name: String, extension: String = "png") => {
-    return `${imageAssetPath}/enemy/${name}.${extension}`;
+const getImagePath = (name: string) => {
+    return `${imageAssetPath}/${name}`;
 }
 
-export const getPlayerImagePath = (name: String, extension: String = "png") => {
-    return `${imageAssetPath}/player/${name}.${extension}`;
+export const getEnemyImagePath = (name: string, extension: String = "png") => {
+    return getImagePath(`enemy/${name}.${extension}`);
+}
+
+export const getPlayerImagePath = (name: string, extension: String = "png") => {
+    return getImagePath(`player/${name}.${extension}`);
+}
+
+export const getActionCardImagePath = (name: string, extension: String = "png") => {
+    return getImagePath(`action_card/${name}.${extension}`);
 }
