@@ -8,7 +8,7 @@ const narrate = async (scene: BattleScene, text: string) => {
   }
   scene.narrator?.addText(text);
   await waitUntil(() => {
-    return !scene.narrator?.isNarrating();
+    return !scene.narrator?.isNarrating;
   });
 };
 
