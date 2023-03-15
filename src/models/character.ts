@@ -38,22 +38,22 @@ class Character extends Phaser.GameObjects.Sprite {
     scene: BattleScene;
 
     get maxHp() {
-        return this.status.maxHpLevel
+        return this.status.maxHpLevel*10;
     }
     get maxMp() {
-        return this.status.maxMpLevel
+        return this.status.maxMpLevel;
     }
     get attack() {
-        return this.status.attackLevel
+        return this.status.attackLevel;
     }
     get defense() {
-        return this.status.defenseLevel
+        return this.status.defenseLevel;
     }
     get speed() {
-        return this.status.speedLevel
+        return this.status.speedLevel;
     }
     get charm() {
-        return this.status.charmLevel
+        return this.status.charmLevel;
     }
 
 
@@ -204,8 +204,8 @@ class Character extends Phaser.GameObjects.Sprite {
     async restoreHealth(amount: integer, exceedMax: boolean = false) {
         let startHp = this.status.hp;
         this.status.hp += amount;
-        if (!exceedMax && this.status.hp > this.status.maxHpLevel) {
-            this.status.hp = this.status.maxHpLevel;
+        if (!exceedMax && this.status.hp > this.maxHp) {
+            this.status.hp = this.maxHp;
         }
         let diff = this.status.hp - startHp;
         await narrate(this.scene, `${this.status.name}の体力が${diff}回復した`);
@@ -215,7 +215,7 @@ class Character extends Phaser.GameObjects.Sprite {
 
     // ステータス表示を更新するメソッド
     updateStatusIndicator() {
-        this.hpIndicator.setText(formatHp(this.status.hp, this.status.maxHpLevel));
+        this.hpIndicator.setText(formatHp(this.status.hp, this.maxHp));
     }
 }
 
