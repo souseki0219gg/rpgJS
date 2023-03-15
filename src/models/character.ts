@@ -10,7 +10,7 @@ type CharacterStatusInitArgs = {
     name?: string,
     maxHpLevel?: integer,
     hp?: integer,
-    maxMpLevel?: integer
+    maxMpLevel?: integer,
     mp?: integer,
     attackLevel?: integer,
     defenseLevel?: integer,
@@ -176,7 +176,7 @@ class Character extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
 
         // ステータスを表示させる
-        this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.status.maxHpLevel));
+        this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.maxHp));
     }
 
     // キャラクターがダメージを受けるメソッド
