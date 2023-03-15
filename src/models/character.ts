@@ -8,25 +8,54 @@ import { TextureKeys } from "../constants/game";
 
 type CharacterStatusInitArgs = {
     name?: string,
-    maxHp?: integer,
+    maxHpLevel?: integer,
     hp?: integer,
-    attack?: integer,
-    defense?: integer,
+    maxMpLevel?: integer
+    mp?: integer,
+    attackLevel?: integer,
+    defenseLevel?: integer,
+    speedLevel?: integer,
+    charmLevel?: integer,
 }
 
 type CharacterStatus = {
     name: string,
-    maxHp: integer,
+    maxHpLevel: integer,
     hp: integer,
-    attack: integer,
-    defense: integer,
+    maxMpLevel: integer,
+    mp: integer,
+    attackLevel: integer,
+    defenseLevel: integer,
+    speedLevel: integer,
+    charmLevel: integer,
 }
+
 
 class Character extends Phaser.GameObjects.Sprite {
     public status: CharacterStatus;
     public cards: [ActionCard, ActionCard, ActionCard, ActionCard, ActionCard];
     private hpIndicator: Phaser.GameObjects.Text;
     scene: BattleScene;
+
+    get maxHp() {
+        return this.status.maxHpLevel
+    }
+    get maxMp() {
+        return this.status.maxMpLevel
+    }
+    get attack() {
+        return this.status.attackLevel
+    }
+    get defense() {
+        return this.status.defenseLevel
+    }
+    get speed() {
+        return this.status.speedLevel
+    }
+    get charm() {
+        return this.status.charmLevel
+    }
+
 
     constructor(
         scene: BattleScene,
@@ -42,10 +71,14 @@ class Character extends Phaser.GameObjects.Sprite {
         // キャラクターのステータスを定義する
         this.status = {
             name: status.name || DefaultStatus.name,
-            maxHp: status.maxHp || DefaultStatus.maxHp,
+            maxHpLevel: status.maxHpLevel || DefaultStatus.maxHpLevel,
             hp: status.hp || DefaultStatus.hp,
-            attack: status.attack || DefaultStatus.attack,
-            defense: status.defense || DefaultStatus.defense,
+            attackLevel: status.attackLevel || DefaultStatus.attackLevel,
+            defenseLevel: status.defenseLevel || DefaultStatus.defenseLevel,
+            maxMpLevel: status.maxMpLevel || DefaultStatus.maxMpLevel,
+            mp: status.mp || DefaultStatus.mp,
+            speedLevel: status.speedLevel || DefaultStatus.speedLevel,
+            charmLevel: status.charmLevel || DefaultStatus.charmLevel,
         };
 
         const cardViewable = this instanceof Player;
@@ -143,7 +176,7 @@ class Character extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
 
         // ステータスを表示させる
-        this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.status.maxHp));
+        this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.status.maxHpLevel));
     }
 
     // キャラクターがダメージを受けるメソッド
@@ -171,8 +204,8 @@ class Character extends Phaser.GameObjects.Sprite {
     async restoreHealth(amount: integer, exceedMax: boolean = false) {
         let startHp = this.status.hp;
         this.status.hp += amount;
-        if (!exceedMax && this.status.hp > this.status.maxHp) {
-            this.status.hp = this.status.maxHp;
+        if (!exceedMax && this.status.hp > this.status.maxHpLevel) {
+            this.status.hp = this.status.maxHpLevel;
         }
         let diff = this.status.hp - startHp;
         await narrate(this.scene, `${this.status.name}の体力が${diff}回復した`);
@@ -182,7 +215,7 @@ class Character extends Phaser.GameObjects.Sprite {
 
     // ステータス表示を更新するメソッド
     updateStatusIndicator() {
-        this.hpIndicator.setText(formatHp(this.status.hp, this.status.maxHp));
+        this.hpIndicator.setText(formatHp(this.status.hp, this.status.maxHpLevel));
     }
 }
 
