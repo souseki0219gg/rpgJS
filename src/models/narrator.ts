@@ -65,7 +65,7 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
   }
 
   // ナレーターがアクティブか確認するメソッド
-  isNarrating() {
+  get isNarrating() {
     return this.texts.length > 0
   }
 }

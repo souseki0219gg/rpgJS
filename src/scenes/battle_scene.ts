@@ -3,18 +3,19 @@ import Character, { Enemy, Player } from "../models/character";
 import { getActionCardImagePath, getEnemyImagePath, getPlayerImagePath } from "../utils/get_path";
 import Narrator from "../models/narrator";
 import { SceneKeys, TextureKeys } from "../constants/game";
+import waitUntil from "../utils/wait_until";
 
 class BattleScene extends Phaser.Scene {
     private player?: Character;
     private enemy?: Character;
-    private isBattleEnd: boolean;
+    private _isBattleEnd: boolean;
     public narrator?: Narrator;
     private commandText?: Phaser.GameObjects.Text;
 
     constructor() {
         super({ key: SceneKeys.battleSceneKey });
         // 戦闘終了を判定するための変数を初期化する
-        this.isBattleEnd = false;
+        this._isBattleEnd = false;
     }
 
     // ロード前に呼ばれる関数
@@ -36,7 +37,7 @@ class BattleScene extends Phaser.Scene {
         });
         this.enemy = new Enemy(this, 300, 100, TextureKeys.enemyKey, 0, {
             name: "enemy",
-            hp: 1000,
+            hp: 100,
         });
         // ナレーションオブジェクトを作成する
         this.narrator = new Narrator(this, 10, 490, TextureKeys.narratorKey, 0, "ナレーターの初期文字列");
@@ -47,11 +48,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     // シーンがアップデートされるたびに呼ばれるメソッド
-    override update(time: number, delta: number) {
-        // 戦闘が終了している場合は処理を終了する
-        if (this.isBattleEnd) {
-            return;
-        }
+    override async update(time: number, delta: number) {
 
         // アクションカードのクールタイムを進める
         for (const card of this.player!.cards) {
@@ -59,6 +56,13 @@ class BattleScene extends Phaser.Scene {
         }
         for (const card of this.enemy!.cards) {
             card.process(delta);
+        }
+
+        // 戦闘が終了している場合は次の戦闘に向けて進める
+        if (this._isBattleEnd) {
+            await waitUntil(() => !this.narrator?.isNarrating);
+            // 次の部屋に移る処理を記述する
+            return;
         }
 
         // 敵のアクションカード実行処理を行う(未実装)
@@ -75,12 +79,26 @@ class BattleScene extends Phaser.Scene {
     }
 
     /**
+     * 戦闘が終了しているかどうか(戦闘中でないかどうか)
+     */
+    get isBattleEnd() {
+        return this._isBattleEnd;
+    };
+
+    /**
+     * 敵味方が初期化されていて、死んでいないか(戦闘が開始できるかどうか)
+     */
+    get ready() {
+        return true
+    }
+
+
+    /**
      * アクションをトリガーする関数
      * 
      * @param action 発火させるアクション
      */
     triggerAction(action: Action<Actions>) {
-        // ここは実際にアクションが発動するようにする
         console.log(`${action.type}のアクションが発動しました`);
         const targets = this.getTargets(action.character, action.targetType);
         for (const target of targets) {
@@ -123,15 +141,19 @@ class BattleScene extends Phaser.Scene {
     }
 
     // 戦闘を終了するメソッド
-    endBattle(winner: Character) {
-        // 戦闘終了を判定する変数を更新する
-        this.isBattleEnd = true;
+    async endBattle(winner: Character) {
+        this._isBattleEnd = true;
 
         // 勝者を表示する
         console.log(`${winner.status.name}の勝利！`);
-        // シーンを遷移する
-        // 作っていないのでエラーとなる
-        // this.scene.start("GameOverScene", { winner: winner });
+
+        // 敗者が敵なら、敵を見えなくする
+        const loser = this.getOpponent(winner);
+        if (loser == this.enemy) {
+            this.enemy.setVisible(false);
+        }
+
+        // 経験値を獲得する
     }
 }
 

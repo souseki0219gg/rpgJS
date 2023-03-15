@@ -28,6 +28,7 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
    * 将来的にイメージ効果、スプライトに置き換える必要あり
    */
   private readonly indicator?: Phaser.GameObjects.Text;
+  scene: BattleScene;
 
   constructor(
     scene: BattleScene,
@@ -47,6 +48,7 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
     frame?: string | number | undefined,
   ) {
     super(scene, x, y, texture, frame);
+    this.scene = scene; // 型変換のため
     this.action = config.action;
     this.name = config.name;
     this.recharge = config.recharge;
@@ -61,7 +63,7 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
           scene.triggerAction(this.action);
           this.remainingTime = this.recharge;
         } else {
-          console.log("チャージ中なので実行できない！");
+          console.log("現在は実行できない！");
         }
 
       });
@@ -74,7 +76,7 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
    * 効果発動できるかどうかを返す関数
    */
   get canEffect() {
-    return this.remainingTime === 0;
+    return this.remainingTime === 0 && !this.scene.isBattleEnd
   }
 
   activateEffect() {
