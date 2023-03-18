@@ -1,4 +1,5 @@
 import Character from "./character";
+import { StateAnomaly } from "./state _anomaly";
 
 export enum Actions {
     /**
@@ -64,6 +65,7 @@ export class AttackData extends ActionData {
 
     execute(character: Character, target: Character): void {
         target.takeDamage(10);
+        target.takeStateAnomaly(StateAnomaly.poison, 30000);
     }
 }
 

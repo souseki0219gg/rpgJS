@@ -58,6 +58,10 @@ class BattleScene extends Phaser.Scene {
             card.process(delta);
         }
 
+        this.player?.decreaseStateAnomalyTime(delta);
+
+        this.enemy?.decreaseStateAnomalyTime(delta);
+
         // 戦闘が終了している場合は次の戦闘に向けて進める
         if (this._isBattleEnd) {
             await waitUntil(() => !this.narrator?.isNarrating);
