@@ -1,5 +1,5 @@
 import Character from "./character";
-import { StateAnomalies, StateAnomaly } from "./state _anomaly";
+import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 
 export enum Actions {
     /**

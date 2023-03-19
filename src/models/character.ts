@@ -5,7 +5,7 @@ import narrate from "../utils/narrate";
 import { formatHp } from "../utils/format";
 import ActionCard from "./action_card";
 import { TextureKeys } from "../constants/game";
-import { StateAnomalies, StateAnomaly } from "./state _anomaly";
+import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 
 type CharacterStatusInitArgs = {
     name?: string,
