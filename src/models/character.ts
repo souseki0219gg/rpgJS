@@ -5,8 +5,7 @@ import narrate from "../utils/narrate";
 import { formatHp } from "../utils/format";
 import ActionCard from "./action_card";
 import { TextureKeys } from "../constants/game";
-import { StateAnomaly } from "./state _anomaly";
-import { StateAnomalyRemainingMap } from "./state _anomaly";
+import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 
 type CharacterStatusInitArgs = {
     name?: string,
@@ -39,11 +38,11 @@ class Character extends Phaser.GameObjects.Sprite {
     private hpIndicator: Phaser.GameObjects.Text;
     scene: BattleScene;
 
-    private readonly stateAnomalies: Array<StateAnomalyRemainingMap>;
+    private readonly stateAnomalies: Array<StateAnomaly<StateAnomalies>>;
 
 
     get maxHp() {
-        return this.status.maxHpLevel*10;
+        return this.status.maxHpLevel * 10;
     }
     get maxMp() {
         return this.status.maxMpLevel;
@@ -186,7 +185,7 @@ class Character extends Phaser.GameObjects.Sprite {
         this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.maxHp));
     }
 
-    public getStateAnomalies(): Array<StateAnomalyRemainingMap> {
+    public getStateAnomalies(): Array<StateAnomaly<StateAnomalies>> {
         return this.stateAnomalies;
     }
 
@@ -201,19 +200,19 @@ class Character extends Phaser.GameObjects.Sprite {
     }
 
     // 状態異常を付与されるメソッド
-    takeStateAnomaly(stateAnomaly: StateAnomaly, time: number) {
-        const anomalyIndex = this.stateAnomalies.findIndex((anomaly) => anomaly.type === stateAnomaly);
-        if (anomalyIndex === -1 || this.stateAnomalies[anomalyIndex].time < time) {
+    takeStateAnomaly(stateAnomaly: StateAnomaly<StateAnomalies>) {
+        const anomalyIndex = this.stateAnomalies.findIndex((anomaly) => anomaly.type === stateAnomaly.type);
+        if (anomalyIndex === -1 || this.stateAnomalies[anomalyIndex].remaining < stateAnomaly.remaining) {
             // 状態異常を新しく追加するか、残り時間が引数より短い場合には更新する
-            this.stateAnomalies[anomalyIndex] = { type: stateAnomaly, time: time };
+            this.stateAnomalies[anomalyIndex] = stateAnomaly;
         }
     }
 
     // 状態異常の残り時間を減少させるメソッド
     decreaseStateAnomalyTime(deltaTime: number) {
         for (let i = 0; i < this.stateAnomalies.length; i++) {
-            this.stateAnomalies[i].time -= deltaTime;
-            if (this.stateAnomalies[i].time <= 0) {
+            this.stateAnomalies[i].decreaseRemaining(deltaTime);
+            if (this.stateAnomalies[i].remaining <= 0) {
                 this.stateAnomalies.splice(i, 1);
                 i--;
             }
