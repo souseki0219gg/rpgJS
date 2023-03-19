@@ -1,5 +1,5 @@
 import Character from "./character";
-import { StateAnomaly } from "./state _anomaly";
+import { StateAnomalies, StateAnomaly } from "./state _anomaly";
 
 export enum Actions {
     /**
@@ -60,7 +60,7 @@ abstract class ActionData {
 
 
 
-export class percentageDamage extends ActionData{
+export class percentageDamage extends ActionData {
     constructor() {
         super()
     }
@@ -71,13 +71,17 @@ export class percentageDamage extends ActionData{
     }
 }
 
-export class PoisonState extends ActionData{
+export class PoisonState extends ActionData {
     constructor() {
         super()
     }
 
     execute(character: Character, target: Character): void {
-        target.takeStateAnomaly(StateAnomaly.slipDamage, 30000)
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.slipDamage,
+            level: 1,
+            remaining: 30000,
+        }))
     }
 }
 

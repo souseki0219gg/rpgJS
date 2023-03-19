@@ -1,25 +1,42 @@
-export enum  StateAnomaly {
-    slipDamage,
+// 状態異常列挙型
+export enum StateAnomalies {
     //スリップダメージ
-    AttackBuff,
+    slipDamage,
     //攻撃力バフ
-    DefenseBuff,
+    AttackBuff,
     //防御力バフ
-    SpeedBuff,
+    DefenseBuff,
     //素早さバフ
-    CharmBuff,
+    SpeedBuff,
     //魔力バフ
-    instantDeath,
+    CharmBuff,
     //即死率
-    increaseCoolTime,
+    instantDeath,
     //クールタイム増加
-    stopCoolTime,
+    increaseCoolTime,
     //クールタイム停止
-    AccuracyRateBuff,
+    stopCoolTime,
     //命中率バフ
+    AccuracyRateBuff,
 }
 
-export type StateAnomalyRemainingMap = {
-    type: StateAnomaly, 
-    time: number,
+export class StateAnomaly<T extends StateAnomalies> {
+    public readonly type: T;
+    public level: number;
+    public remaining: number;
+
+    constructor(config: {
+        type: T,
+        level: number,
+        remaining: number,
+    }) {
+        this.type = config.type;
+        this.level = config.level;
+        this.remaining = config.remaining;
+    }
+
+    // 自分自身の残り時間を減少させる関数
+    decreaseRemaining(delta: number) {
+        this.remaining -= delta;
+    }
 }
