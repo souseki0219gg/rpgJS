@@ -5,6 +5,8 @@ import narrate from "../utils/narrate";
 import { formatHp } from "../utils/format";
 import ActionCard from "./action_card";
 import { TextureKeys } from "../constants/game";
+import { StateAnomaly } from "./state _anomaly";
+import { StateAnomalyRemainingMap } from "./state _anomaly";
 
 type CharacterStatusInitArgs = {
     name?: string,
@@ -37,6 +39,9 @@ class Character extends Phaser.GameObjects.Sprite {
     private hpIndicator: Phaser.GameObjects.Text;
     scene: BattleScene;
 
+    private readonly stateAnomalies: Array<StateAnomalyRemainingMap>;
+
+
     get maxHp() {
         return this.status.maxHpLevel*10;
     }
@@ -67,6 +72,8 @@ class Character extends Phaser.GameObjects.Sprite {
     ) {
         super(scene, x, y, texture, frame);
         this.scene = scene; // 型変換のため
+
+        this.stateAnomalies = [];
 
         // キャラクターのステータスを定義する
         this.status = {
@@ -179,6 +186,10 @@ class Character extends Phaser.GameObjects.Sprite {
         this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.maxHp));
     }
 
+    public getStateAnomalies(): Array<StateAnomalyRemainingMap> {
+        return this.stateAnomalies;
+    }
+
     // キャラクターがダメージを受けるメソッド
     async takeDamage(damage: integer) {
         this.status.hp -= damage;
@@ -186,6 +197,26 @@ class Character extends Phaser.GameObjects.Sprite {
         await narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
         if (this.isDead) {
             this.die();
+        }
+    }
+
+    // 状態異常を付与されるメソッド
+    takeStateAnomaly(stateAnomaly: StateAnomaly, time: number) {
+        const anomalyIndex = this.stateAnomalies.findIndex((anomaly) => anomaly.type === stateAnomaly);
+        if (anomalyIndex === -1 || this.stateAnomalies[anomalyIndex].time < time) {
+            // 状態異常を新しく追加するか、残り時間が引数より短い場合には更新する
+            this.stateAnomalies[anomalyIndex] = { type: stateAnomaly, time: time };
+        }
+    }
+
+    // 状態異常の残り時間を減少させるメソッド
+    decreaseStateAnomalyTime(deltaTime: number) {
+        for (let i = 0; i < this.stateAnomalies.length; i++) {
+            this.stateAnomalies[i].time -= deltaTime;
+            if (this.stateAnomalies[i].time <= 0) {
+                this.stateAnomalies.splice(i, 1);
+                i--;
+            }
         }
     }
 
