@@ -1,4 +1,3 @@
-import { formatRemaining } from "../utils/format";
 import Character from "./character";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 
@@ -15,6 +14,32 @@ export enum Actions {
      * アイテムを使う
      */
     useItem,
+
+    terror,
+
+    frenzy,
+
+    glamour,
+
+    blindness,
+
+    electricShock,
+
+    freeze,
+
+    sleep,
+
+    paralysis,
+
+    corrosion,
+
+    Burn,
+
+    PercentageDamage,
+
+    Poison,
+
+    confusion,
 }
 
 export enum TargetType {
@@ -40,6 +65,19 @@ type ActionTypeToDataMap = {
     [Actions.attack]: AttackData;
     [Actions.defend]: DefendData;
     [Actions.useItem]: ItemData;
+    [Actions.terror]: TerrorData;
+    [Actions.frenzy]: FrenzyData;
+    [Actions.glamour]: GlamourData;
+    [Actions.blindness]: BlindnessData;
+    [Actions.electricShock]: ElectricShockData;
+    [Actions.freeze]: FreezeData;
+    [Actions.sleep]: SleepData;
+    [Actions.paralysis]: ParalysisData;
+    [Actions.corrosion]: CorrosionData;
+    [Actions.Burn]: BurnData;
+    [Actions.PercentageDamage]: PercentageDamageData;
+    [Actions.Poison]: PoisonData;
+    [Actions.confusion]: confusionData;
 }
 
 /**
@@ -59,7 +97,7 @@ abstract class ActionData {
     execute(character: Character, target: Character): void { }
 }
 
-export class terror extends ActionData {
+export class TerrorData extends ActionData {
     constructor() {
         super()
     }
@@ -91,7 +129,7 @@ export class terror extends ActionData {
     }
 }
 
-export class Frenzy extends ActionData {
+export class FrenzyData extends ActionData {
     constructor() {
         super()
     }
@@ -111,7 +149,7 @@ export class Frenzy extends ActionData {
     }
 }
 
-export class Glamour extends ActionData {
+export class GlamourData extends ActionData {
     constructor() {
         super()
     }
@@ -125,7 +163,7 @@ export class Glamour extends ActionData {
     }
 }
 
-export class Blindness extends ActionData {
+export class BlindnessData extends ActionData {
     constructor() {
         super()
     }
@@ -140,7 +178,7 @@ export class Blindness extends ActionData {
     }
 }
 
-export class electricShock extends ActionData {
+export class ElectricShockData extends ActionData {
     constructor() {
         super()
     }
@@ -168,7 +206,7 @@ export class electricShock extends ActionData {
     }
 }
 
-export class freeze extends ActionData {
+export class FreezeData extends ActionData {
     constructor() {
         super()
     }
@@ -188,7 +226,7 @@ export class freeze extends ActionData {
     }
 }
 
-export class sleep extends ActionData {
+export class SleepData extends ActionData {
     constructor() {
         super()
     }
@@ -208,7 +246,7 @@ export class sleep extends ActionData {
     }
 }
 
-export class paralysis extends ActionData {
+export class confusionData extends ActionData {
     constructor() {
         super()
     }
@@ -228,7 +266,7 @@ export class paralysis extends ActionData {
     }
 }
 
-export class corrosion extends ActionData {
+export class CorrosionData extends ActionData {
     constructor() {
         super()
     }
@@ -248,7 +286,7 @@ export class corrosion extends ActionData {
     }
 }
 
-export class Paralysis extends ActionData {
+export class ParalysisData extends ActionData {
     constructor() {
         super()
     }
@@ -262,7 +300,7 @@ export class Paralysis extends ActionData {
     }
 }
 
-export class Burn extends ActionData{
+export class BurnData extends ActionData{
     constructor() {
         super()
     }
@@ -281,7 +319,7 @@ export class Burn extends ActionData{
     }
 }
 
-export class PercentageDamage extends ActionData {
+export class PercentageDamageData extends ActionData {
     constructor() {
         super()
     }
@@ -292,7 +330,7 @@ export class PercentageDamage extends ActionData {
     }
 }
 
-export class Poison extends ActionData {
+export class PoisonData extends ActionData {
     constructor() {
         super()
     }

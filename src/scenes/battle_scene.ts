@@ -1,5 +1,5 @@
 import Action, { Actions, AttackData, DefendData, ItemData, TargetType } from "../models/action";
-import Character, { Enemy, Player } from "../models/character";
+import Character, { Enemy, Player, } from "../models/character";
 import { getActionCardImagePath, getEnemyImagePath, getPlayerImagePath } from "../utils/get_path";
 import Narrator from "../models/narrator";
 import { SceneKeys, TextureKeys } from "../constants/game";
@@ -70,7 +70,10 @@ class BattleScene extends Phaser.Scene {
         }
 
         // 敵のアクションカード実行処理を行う(未実装)
-
+        if (this.enemy) {
+            (this.enemy as Enemy).processActionCard(delta);
+        }
+        
         // ゲーム終了判定をする
         if (this.player!.isDead) {
             this.endBattle(this.enemy!);
