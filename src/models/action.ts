@@ -14,31 +14,31 @@ export enum Actions {
      * アイテムを使う
      */
     useItem,
-
+    //恐怖
     terror,
-
+    //狂乱
     frenzy,
-
+    //幻惑
     glamour,
-
+    //盲目
     blindness,
-
+    //感電
     electricShock,
-
+    //凍結
     freeze,
-
+    //睡眠
     sleep,
-
+    //麻痺
     paralysis,
-
+    //腐食
     corrosion,
-
+    //火傷
     Burn,
-
+    //割合ダメージ
     PercentageDamage,
-
+    //毒
     Poison,
-
+    //混乱
     confusion,
 }
 

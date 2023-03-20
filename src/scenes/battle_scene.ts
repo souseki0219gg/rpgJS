@@ -1,5 +1,5 @@
 import Action, { Actions, AttackData, DefendData, ItemData, TargetType } from "../models/action";
-import Character, { Enemy, Player, } from "../models/character";
+import Character, { Enemy, Player } from "../models/character";
 import { getActionCardImagePath, getEnemyImagePath, getPlayerImagePath } from "../utils/get_path";
 import Narrator from "../models/narrator";
 import { SceneKeys, TextureKeys } from "../constants/game";
@@ -7,7 +7,7 @@ import waitUntil from "../utils/wait_until";
 
 class BattleScene extends Phaser.Scene {
     private player?: Character;
-    private enemy?: Character;
+    private enemy?: Enemy;
     private _isBattleEnd: boolean;
     public narrator?: Narrator;
     private commandText?: Phaser.GameObjects.Text;
@@ -69,10 +69,8 @@ class BattleScene extends Phaser.Scene {
             return;
         }
 
-        // 敵のアクションカード実行処理を行う(未実装)
-        if (this.enemy) {
-            (this.enemy as Enemy).processActionCard(delta);
-        }
+        // 敵のアクションカード実行処理を行う
+        this.enemy?.processActionCard(delta);
         
         // ゲーム終了判定をする
         if (this.player!.isDead) {
