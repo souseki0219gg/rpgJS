@@ -18,6 +18,14 @@ export enum StateAnomalies {
     stopCoolTime,
     //命中率バフ
     AccuracyRateBuff,
+    //火属性やられ
+    fireAttribute,
+    //氷属性やられ
+    freezingAttribute,
+    //雷属性やられ 
+    lightningAttribute,
+    //被ダメージアップ
+    increasedDamageSuffered,
 }
 
 export class StateAnomaly<T extends StateAnomalies> {
