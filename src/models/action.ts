@@ -14,6 +14,32 @@ export enum Actions {
      * アイテムを使う
      */
     useItem,
+    //恐怖
+    terror,
+    //狂乱
+    frenzy,
+    //幻惑
+    glamour,
+    //盲目
+    blindness,
+    //感電
+    electricShock,
+    //凍結
+    freeze,
+    //睡眠
+    sleep,
+    //麻痺
+    paralysis,
+    //腐食
+    corrosion,
+    //火傷
+    burn,
+    //割合ダメージ
+    percentageDamage,
+    //毒
+    poison,
+    //混乱
+    confusion,
 }
 
 export enum TargetType {
@@ -39,6 +65,19 @@ type ActionTypeToDataMap = {
     [Actions.attack]: AttackData;
     [Actions.defend]: DefendData;
     [Actions.useItem]: ItemData;
+    [Actions.terror]: TerrorData;
+    [Actions.frenzy]: FrenzyData;
+    [Actions.glamour]: GlamourData;
+    [Actions.blindness]: BlindnessData;
+    [Actions.electricShock]: ElectricShockData;
+    [Actions.freeze]: FreezeData;
+    [Actions.sleep]: SleepData;
+    [Actions.paralysis]: ParalysisData;
+    [Actions.corrosion]: CorrosionData;
+    [Actions.burn]: BurnData;
+    [Actions.percentageDamage]: PercentageDamageData;
+    [Actions.poison]: PoisonData;
+    [Actions.confusion]: confusionData;
 }
 
 /**
@@ -58,9 +97,229 @@ abstract class ActionData {
     execute(character: Character, target: Character): void { }
 }
 
+export class TerrorData extends ActionData {
+    constructor() {
+        super()
+    }
 
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.AttackBuff,
+            level: -1,
+            remaining: 30000
+        }))
 
-export class percentageDamage extends ActionData {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.DefenseBuff,
+            level: -1,
+            remaining: 30000
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.SpeedBuff,
+            level: -1,
+            remaining: 30000
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.CharmBuff,
+            level: -1,
+            remaining: 30000
+        }))
+    }
+}
+
+export class FrenzyData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.AttackBuff,
+            level: 1,
+            remaining: 30000
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.AccuracyRateBuff,
+            level: -1,
+            remaining: 30000
+        }))
+    }
+}
+
+export class GlamourData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.AttackBuff,
+            level: -1,
+            remaining: 30000
+        }))
+    }
+}
+
+export class BlindnessData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+    target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.AccuracyRateBuff,
+            level: 1,
+            remaining: 30000,
+
+        }))
+    }
+}
+
+export class ElectricShockData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.lightningAttribute,
+            level: 1,
+            remaining: 30000
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.increasedDamageSuffered,
+            level: 1,
+            remaining: 30000,
+        }))
+
+        if (Math.random() < 0.5) {
+            target.takeStateAnomaly(new StateAnomaly({
+                type: StateAnomalies.AccuracyRateBuff,
+                level: -1,
+                remaining: 30000,
+            }))
+        }
+    }
+}
+
+export class FreezeData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.increaseCoolTime,
+            level: 1,
+            remaining: 30000
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.freezingAttribute,
+            level: 1,
+            remaining: 30000
+        }))
+    }
+}
+
+export class SleepData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.stopCoolTime,
+            level: 1,
+            remaining: 30000,
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.increasedDamageSuffered,
+            level: 1,
+            remaining: 30000
+        }))
+    }
+}
+
+export class confusionData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.increasedDamageSuffered,
+            level: 1,
+            remaining: 30000,
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.AccuracyRateBuff,
+            level: -1,
+            remaining: 30000,
+        }))
+    }
+}
+
+export class CorrosionData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.increasedDamageSuffered,
+            level: 1,
+            remaining: 30000,
+        }))
+
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.slipDamage,
+            level: 1,
+            remaining: 30000,
+        }))
+    }
+}
+
+export class ParalysisData extends ActionData {
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.increaseCoolTime,
+            level: 1,
+            remaining: 60000,
+        }))
+    }
+}
+
+export class BurnData extends ActionData{
+    constructor() {
+        super()
+    }
+
+    execute(character: Character, target: Character): void {
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.slipDamage,
+            level: 1,
+            remaining: 30000,
+        }))
+        target.takeStateAnomaly(new StateAnomaly({
+            type: StateAnomalies.fireAttribute,
+            level: 1,
+            remaining: 30000,
+        }))
+    }
+}
+
+export class PercentageDamageData extends ActionData {
     constructor() {
         super()
     }
@@ -71,7 +330,7 @@ export class percentageDamage extends ActionData {
     }
 }
 
-export class PoisonState extends ActionData {
+export class PoisonData extends ActionData {
     constructor() {
         super()
     }

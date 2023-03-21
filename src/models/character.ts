@@ -257,6 +257,15 @@ export class Player extends Character {
 export class Enemy extends Character {
     // 敵の定義をここで行う
     // 敵特有の関数はここで定義する
+
+    processActionCard(delta: number) {
+
+        for (const card of this.cards) {
+            if (card.canEffect) {
+                this.scene.triggerAction(card.action);
+            }
+        }
+    }
 }
 
 export default Character;

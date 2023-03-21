@@ -7,7 +7,7 @@ import waitUntil from "../utils/wait_until";
 
 class BattleScene extends Phaser.Scene {
     private player?: Character;
-    private enemy?: Character;
+    private enemy?: Enemy;
     private _isBattleEnd: boolean;
     public narrator?: Narrator;
     private commandText?: Phaser.GameObjects.Text;
@@ -69,8 +69,9 @@ class BattleScene extends Phaser.Scene {
             return;
         }
 
-        // 敵のアクションカード実行処理を行う(未実装)
-
+        // 敵のアクションカード実行処理を行う
+        this.enemy?.processActionCard(delta);
+        
         // ゲーム終了判定をする
         if (this.player!.isDead) {
             this.endBattle(this.enemy!);
