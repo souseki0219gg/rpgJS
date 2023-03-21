@@ -33,11 +33,11 @@ export enum Actions {
     //腐食
     corrosion,
     //火傷
-    Burn,
+    burn,
     //割合ダメージ
-    PercentageDamage,
+    percentageDamage,
     //毒
-    Poison,
+    poison,
     //混乱
     confusion,
 }
@@ -74,9 +74,9 @@ type ActionTypeToDataMap = {
     [Actions.sleep]: SleepData;
     [Actions.paralysis]: ParalysisData;
     [Actions.corrosion]: CorrosionData;
-    [Actions.Burn]: BurnData;
-    [Actions.PercentageDamage]: PercentageDamageData;
-    [Actions.Poison]: PoisonData;
+    [Actions.burn]: BurnData;
+    [Actions.percentageDamage]: PercentageDamageData;
+    [Actions.poison]: PoisonData;
     [Actions.confusion]: confusionData;
 }
 
