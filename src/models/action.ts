@@ -393,7 +393,7 @@ export class AttackData extends ActionData {
   }
 
   execute(character: Character, target: Character): void {
-    target.takeDamage(10);
+    target.takeDamage(character.attack);
   }
 }
 

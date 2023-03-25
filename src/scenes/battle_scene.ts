@@ -34,6 +34,7 @@ class BattleScene extends Phaser.Scene {
     this.player = new Player(this, 100, 100, TextureKeys.playerKey, 0, {
       name: "player",
       hp: 300,
+      attackLevel: 15,
     });
     this.enemy = new Enemy(this, 300, 100, TextureKeys.enemyKey, 0, {
       name: "enemy",
@@ -147,6 +148,7 @@ class BattleScene extends Phaser.Scene {
 
   // 戦闘を終了するメソッド
   async endBattle(winner: Character) {
+    if (this._isBattleEnd) return;
     this._isBattleEnd = true;
 
     // 勝者を表示する
@@ -156,9 +158,16 @@ class BattleScene extends Phaser.Scene {
     const loser = this.getOpponent(winner);
     if (loser == this.enemy) {
       this.enemy.setVisible(false);
-    }
 
-    // 経験値を獲得する
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 次の敵を出す
+      this.enemy.reset();
+      
+      // 経験値を獲得する(未実装)
+
+      this._isBattleEnd = false;
+    }
   }
 }
 

@@ -59,13 +59,7 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
       // タップされたときに技を発動するようにする
       this.setInteractive();
       this.on('pointerdown', () => {
-        if (this.canEffect) {
-          scene.triggerAction(this.action);
-          this.remainingTime = this.recharge;
-        } else {
-          console.log("現在は実行できない！");
-        }
-
+        this.activateEffect();
       });
       this.indicator = scene.add.text(x, y - 30, '');
       this.updateIndicator();
@@ -80,8 +74,13 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
   }
 
   activateEffect() {
-    console.log(`${this.name}の効果を発動した！`);
-    this.remainingTime = this.recharge;
+    if (this.canEffect) {
+      console.log(`${this.name}のアクション発動！`);
+      this.scene.triggerAction(this.action);
+      this.remainingTime = this.recharge;
+    } else {
+      console.log("現在は実行できない！");
+    }
   }
 
   /**

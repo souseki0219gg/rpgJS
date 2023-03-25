@@ -1,16 +1,16 @@
 import { Room } from "./room.js";
 
 type FloorInitArgs = {
-    // 第何階か
-    floor?: integer,
-    // この階層の名前
-    name?: string,
-    // この階層のレベル（難易度）
-    level?: integer,
-    // この階層の規模
-    size?: integer,
-    // この階層に属する部屋
-    rooms?: Array<Room>,
+  // 第何階か
+  floor?: integer,
+  // この階層の名前
+  name?: string,
+  // この階層のレベル（難易度）
+  level?: integer,
+  // この階層の規模
+  size?: integer,
+  // この階層に属する部屋
+  rooms?: Array<Room>,
 }
 
 export class Floor {

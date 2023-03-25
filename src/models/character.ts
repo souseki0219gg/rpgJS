@@ -48,7 +48,7 @@ class Character extends Phaser.GameObjects.Sprite {
     return this.status.maxMpLevel;
   }
   get attack() {
-    return this.status.attackLevel;
+    return this.status.attackLevel * 3;
   }
   get defense() {
     return this.status.defenseLevel;
@@ -259,12 +259,18 @@ export class Enemy extends Character {
   // 敵特有の関数はここで定義する
 
   processActionCard(delta: number) {
-
+    
+    // 平均して1秒に1回打つ方式
     for (const card of this.cards) {
-      if (card.canEffect) {
-        this.scene.triggerAction(card.action);
+      if (Math.random() < delta / 1000 / 5) {
+        card.activateEffect();
       }
     }
+  }
+
+  reset() {
+    this.restoreHealth(this.maxHp - this.status.hp);
+    this.setVisible(true);
   }
 }
 
