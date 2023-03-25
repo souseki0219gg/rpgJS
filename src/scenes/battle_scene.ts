@@ -71,7 +71,7 @@ class BattleScene extends Phaser.Scene {
 
         // 敵のアクションカード実行処理を行う
         this.enemy?.processActionCard(delta);
-        
+
         // ゲーム終了判定をする
         if (this.player!.isDead) {
             this.endBattle(this.enemy!);
