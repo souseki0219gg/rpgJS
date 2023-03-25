@@ -37,9 +37,9 @@ export class Floor {
 
   initRooms(
     config: {
-            size: integer,
-            level: integer,
-        }
+      size: integer,
+      level: integer,
+    }
   ): Array<Room> {
     // 部屋を作成する関数をここに記述する
     const rooms = [

@@ -1,9 +1,9 @@
+/* eslint-disable no-undef */
 module.exports = {
   root: true,
   env: {
     browser: true,
     es2021: true,
-    node: true,
   },
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
@@ -20,6 +20,10 @@ module.exports = {
     "no-console": "warn",
     camelcase: ["error", { properties: "never" }],
     semi: ["error", "always"],
-    indent: ["error", 2]
+    indent: ["error", 2],
+    "no-warning-comments": [
+      "warn",
+      { "terms": ["todo", "fixme"], "location": "anywhere" }
+    ]
   },
 };

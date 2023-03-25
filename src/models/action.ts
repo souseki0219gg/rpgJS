@@ -2,44 +2,85 @@ import Character from "./character";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 
 export enum Actions {
-    /**
-     * 通常攻撃
-     */
-    attack,
-    /**
-     * 防御
-     */
-    defend,
-    /**
-     * アイテムを使う
-     */
-    useItem,
-    //恐怖
-    terror,
-    //狂乱
-    frenzy,
-    //幻惑
-    glamour,
-    //盲目
-    blindness,
-    //感電
-    electricShock,
-    //凍結
-    freeze,
-    //睡眠
-    sleep,
-    //麻痺
-    paralysis,
-    //腐食
-    corrosion,
-    //火傷
-    burn,
-    //割合ダメージ
-    percentageDamage,
-    //毒
-    poison,
-    //混乱
-    confusion,
+  /**
+   * 通常攻撃
+   */
+  attack,
+
+  /**
+   * 防御
+   */
+  defend,
+
+  /**
+   * アイテムを使う
+   */
+  useItem,
+
+  /**
+   * 恐怖
+   */
+  terror,
+
+  /**
+   * 狂乱
+   */
+  frenzy,
+
+  /**
+   * 幻惑
+   */
+  glamour,
+
+  /**
+   * 盲目
+   */
+  blindness,
+
+  /**
+   * 感電
+   */
+  electricShock,
+
+  /**
+   * 凍結
+   */
+  freeze,
+
+  /**
+   * 睡眠
+   */
+  sleep,
+
+  /**
+   * 麻痺
+   */
+  paralysis,
+
+  /**
+   * 腐食
+   */
+  corrosion,
+
+  /**
+   * 火傷
+   */
+  burn,
+
+  /**
+   * 割合ダメージ
+   */
+  percentageDamage,
+
+  /**
+   * 毒
+   */
+  poison,
+
+  /**
+   * 混乱
+   */
+  confusion,
 }
 
 export enum TargetType {
@@ -88,11 +129,11 @@ type ActionTypeToDataMap = {
 abstract class ActionData {
 
   /**
-     * このアクションで発生する効果を記述した関数。最終的にこのコードが実行されることで効果が発動する。
-     * 
-     * @param character 行動主のキャラクター
-     * @param target 行動対象のキャラクター
-     */
+   * このアクションで発生する効果を記述した関数。最終的にこのコードが実行されることで効果が発動する。
+   * 
+   * @param character 行動主のキャラクター
+   * @param target 行動対象のキャラクター
+   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute(character: Character, target: Character): void {
     throw new Error("このメソッドは派生クラスから呼び出してください！");
@@ -361,6 +402,7 @@ export class DefendData extends ActionData {
     super();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute(character: Character, target: Character): void {
     // 一定秒数防御力が上がる仕組みを実装する
   }
@@ -375,6 +417,7 @@ export class ItemData extends ActionData {
     super();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute(character: Character, target: Character): void {
     // アイテムを消費して、そのアイテムの効果を発動する仕組みをここに実装する
   }
@@ -382,20 +425,20 @@ export class ItemData extends ActionData {
 
 class Action<T extends Actions> {
   /**
-     * このアクションがどのタイプに属するかを示すプロパティ
-     */
+   * このアクションがどのタイプに属するかを示すプロパティ
+   */
   public readonly type: T;
   /**
-     * アクションの行動主。ターゲットと違い、こちらは`Action`の初期化時に決定される。
-     */
+   * アクションの行動主。ターゲットと違い、こちらは`Action`の初期化時に決定される。
+   */
   public readonly character: Character;
   /**
-     * アクションの具体的なデータ。中身の型はアクションによって異なる。
-     */
+   * アクションの具体的なデータ。中身の型はアクションによって異なる。
+   */
   public readonly data: ActionTypeToDataMap[T];
   /**
-     * アクションのターゲットのタイプ。アクションの実行時に、このプロパティにしたがって行動対象が決定される。
-     */
+   * アクションのターゲットのタイプ。アクションの実行時に、このプロパティにしたがって行動対象が決定される。
+   */
   public readonly targetType: TargetType;
 
   constructor(
@@ -413,12 +456,12 @@ class Action<T extends Actions> {
   }
 
   /**
-     * アクションのメイン処理を実行する関数。これはscene側から呼びだされる。
-     * 
-     * 行動ターゲットを決定した後、その各ターゲットに対しこの関数が順番に発動していく。
-     * 
-     * @param target 行動ターゲット。
-     */
+   * アクションのメイン処理を実行する関数。これはscene側から呼びだされる。
+   * 
+   * 行動ターゲットを決定した後、その各ターゲットに対しこの関数が順番に発動していく。
+   * 
+   * @param target 行動ターゲット。
+   */
   execute(target: Character) {
     this.data.execute(this.character, target);
   }
