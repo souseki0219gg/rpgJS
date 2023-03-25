@@ -16,7 +16,8 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   ignorePatterns: ["docs", "node_modules"],
   rules: {
-    "no-console": "error",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "no-console": "warn",
     camelcase: ["error", { properties: "never" }],
     semi: ["error", "always"],
     indent: ["error", 2]

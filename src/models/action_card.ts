@@ -76,7 +76,7 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
    * 効果発動できるかどうかを返す関数
    */
   get canEffect() {
-    return this.remainingTime === 0 && !this.scene.isBattleEnd
+    return this.remainingTime === 0 && !this.scene.isBattleEnd;
   }
 
   activateEffect() {

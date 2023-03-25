@@ -11,7 +11,7 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
     y: number,
     texture: string | Phaser.Textures.Texture,
     frame?: string | number | undefined,
-    initialText: string = "",
+    initialText = "",
   ) {
     super(scene, x, y, texture, frame);
 
@@ -24,7 +24,7 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
     this.narrationText = scene.add.text(x, y, this.texts[0], {
       fontSize: "24px",
       stroke: "#fff",
-    })
+    });
 
     // 文字列を追加するイベントを受け取るリスナーを定義する
     this.scene.events.addListener(
@@ -32,7 +32,7 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
       (text: string) => {
         this.addText(text);
       }
-    )
+    );
 
     this.timer = setInterval(() => {
       this.proceed();
@@ -66,6 +66,6 @@ export default class Narrator extends Phaser.GameObjects.Sprite {
 
   // ナレーターがアクティブか確認するメソッド
   get isNarrating() {
-    return this.texts.length > 0
+    return this.texts.length > 0;
   }
 }
