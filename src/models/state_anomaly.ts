@@ -29,22 +29,22 @@ export enum StateAnomalies {
 }
 
 export class StateAnomaly<T extends StateAnomalies> {
-    public readonly type: T;
-    public level: number;
-    public remaining: number;
+  public readonly type: T;
+  public level: number;
+  public remaining: number;
 
-    constructor(config: {
+  constructor(config: {
         type: T,
         level: number,
         remaining: number,
     }) {
-        this.type = config.type;
-        this.level = config.level;
-        this.remaining = config.remaining;
-    }
+    this.type = config.type;
+    this.level = config.level;
+    this.remaining = config.remaining;
+  }
 
-    // 自分自身の残り時間を減少させる関数
-    decreaseRemaining(delta: number) {
-        this.remaining -= delta;
-    }
+  // 自分自身の残り時間を減少させる関数
+  decreaseRemaining(delta: number) {
+    this.remaining -= delta;
+  }
 }

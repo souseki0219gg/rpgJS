@@ -21,10 +21,11 @@ export default class initialScene extends Phaser.Scene {
     startButton.on('pointerdown', () => {
       // ゲームを開始する
       this.scene.start(SceneKeys.battleSceneKey);
-    })
+    });
   }
 
   // フレームごとに呼ばれる関数
   update() {
+    // アップデート関数
   }
 }
