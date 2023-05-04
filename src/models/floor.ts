@@ -1,23 +1,23 @@
-import { Room } from "./room.js";
+import { Room } from "./room";
 
 type FloorInitArgs = {
   // 第何階か
-  floor?: integer,
+  floor?: number,
   // この階層の名前
   name?: string,
   // この階層のレベル（難易度）
-  level?: integer,
+  level?: number,
   // この階層の規模
-  size?: integer,
+  size?: number,
   // この階層に属する部屋
   rooms?: Array<Room>,
 }
 
 export class Floor {
-  public floor: integer;
+  public floor: number;
   public name: string;
-  public level: integer;
-  public size: integer;
+  public level: number;
+  public size: number;
   public rooms: Array<Room>;
   public currentRoom: Room;
 
@@ -37,10 +37,11 @@ export class Floor {
 
   initRooms(
     config: {
-      size: integer,
-      level: integer,
+      size: number,
+      level: number,
     }
   ): Array<Room> {
+    console.log(config);
     // 部屋を作成する関数をここに記述する
     const rooms = [
       new Room({ floor: this }),
@@ -53,7 +54,7 @@ export class Floor {
     if (this.currentRoom.isLast()) {
       console.log("この部屋は最奥です");
     } else {
-      this.currentRoom = this.currentRoom.nextRoom!;
+      this.currentRoom = this.currentRoom.nextRoom as Room;
     }
   }
 }

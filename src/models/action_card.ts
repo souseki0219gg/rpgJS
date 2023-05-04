@@ -1,10 +1,7 @@
 import Action, { Actions } from "./action";
-import Phaser from "phaser";
-import BattleScene from "../scenes/battle_scene";
-import { formatRemaining } from "../utils/format";
+import Game from "./game";
 
-
-export default class ActionCard extends Phaser.GameObjects.Sprite {
+export default class ActionCard {
 
   /**
    * このアクションカードを発動したときのアクション
@@ -23,61 +20,31 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
    */
   public remainingTime: number;
 
-  /**
-   * 技カードの状態を表示するためのテキスト
-   * 将来的にイメージ効果、スプライトに置き換える必要あり
-   */
-  private readonly indicator?: Phaser.GameObjects.Text;
-  scene: BattleScene;
-
   constructor(
-    scene: BattleScene,
-    x: number,
-    y: number,
-    texture: string | Phaser.Textures.Texture,
     config: {
       action: Action<Actions>,
       name: string,
       recharge: number,
-      /**
-       * アクションカードを画面に表示するかどうか
-       * 敵の場合は表示しない
-       */
-      viewable: boolean,
     },
-    frame?: string | number | undefined,
   ) {
-    super(scene, x, y, texture, frame);
-    this.scene = scene; // 型変換のため
     this.action = config.action;
     this.name = config.name;
     this.recharge = config.recharge;
     this.remainingTime = this.recharge;
-
-    if (config.viewable) {
-      scene.add.existing(this);
-      // タップされたときに技を発動するようにする
-      this.setInteractive();
-      this.on('pointerdown', () => {
-        this.activateEffect();
-      });
-      this.indicator = scene.add.text(x, y - 30, '');
-      this.updateIndicator();
-    }
   }
 
   /**
    * 効果発動できるかどうかを返す関数
    */
   get canEffect() {
-    return this.remainingTime === 0 && !this.scene.isBattleEnd;
+    return this.remainingTime === 0;
   }
 
-  activateEffect() {
+  activateEffect(game: Game) {
     if (this.canEffect) {
       console.log(`${this.name}のアクション発動！`);
-      this.scene.triggerAction(this.action);
       this.remainingTime = this.recharge;
+      game.triggerAction(this.action);
     } else {
       console.log("現在は実行できない！");
     }
@@ -94,11 +61,6 @@ export default class ActionCard extends Phaser.GameObjects.Sprite {
       if (this.remainingTime <= 0) {
         this.remainingTime = 0;
       }
-      this.updateIndicator();
     }
-  }
-
-  updateIndicator() {
-    this.indicator?.setText(formatRemaining(this.remainingTime, this.recharge));
   }
 }
