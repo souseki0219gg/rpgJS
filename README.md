@@ -1,6 +1,6 @@
 # rpgJS
 
-JavaScript(TypeScript)とPhaserフレームワークを使ってゲームを作ってみるプロジェクトです。
+Reactフレームワークを使ってゲームを作ってみるプロジェクトです。
 
 ## セットアップ
 ### クローン
@@ -18,7 +18,7 @@ npm i
 
 ## テストサーバー立ち上げ
 ```
-npm start
+npm run dev
 ```
 
 ## ビルド

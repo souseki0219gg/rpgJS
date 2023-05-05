@@ -1,4 +1,4 @@
-export const formatHp = (hp: integer, maxHp?: integer): string => {
+export const formatHp = (hp: number, maxHp?: number): string => {
   let result = 'hp: ' + hp.toString();
   if (maxHp !== undefined) {
     result += '/' + maxHp.toString();

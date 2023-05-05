@@ -1,15 +1,11 @@
-import { isDebugMode } from "../constants/game";
-import BattleScene from "../scenes/battle_scene";
-import waitUntil from "./wait_until";
+import { isDebugMode } from "constants/game";
+import Game from "models/game";
 
-const narrate = async (scene: BattleScene, text: string) => {
+const narrate = async (game: Game, text: string) => {
   if (isDebugMode) {
     console.log(text);
   }
-  scene.narrator?.addText(text);
-  await waitUntil(() => {
-    return !scene.narrator?.isNarrating;
-  });
+  game.narrator.addText(text);
 };
 
 export default narrate;

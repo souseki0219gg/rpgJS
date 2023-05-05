@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Character from "./character";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 
@@ -131,21 +132,17 @@ abstract class ActionData {
   /**
    * このアクションで発生する効果を記述した関数。最終的にこのコードが実行されることで効果が発動する。
    * 
-   * @param character 行動主のキャラクター
-   * @param target 行動対象のキャラクター
+   * @param _character 行動主のキャラクター
+   * @param _target 行動対象のキャラクター
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, _target: Character): void {
     throw new Error("このメソッドは派生クラスから呼び出してください！");
   }
 }
 
 export class TerrorData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.AttackBuff,
       level: -1,
@@ -173,11 +170,8 @@ export class TerrorData extends ActionData {
 }
 
 export class FrenzyData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.AttackBuff,
       level: 1,
@@ -193,11 +187,8 @@ export class FrenzyData extends ActionData {
 }
 
 export class GlamourData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.AttackBuff,
       level: -1,
@@ -207,11 +198,8 @@ export class GlamourData extends ActionData {
 }
 
 export class BlindnessData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.AccuracyRateBuff,
       level: 1,
@@ -222,11 +210,8 @@ export class BlindnessData extends ActionData {
 }
 
 export class ElectricShockData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.lightningAttribute,
       level: 1,
@@ -250,11 +235,8 @@ export class ElectricShockData extends ActionData {
 }
 
 export class FreezeData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.increaseCoolTime,
       level: 1,
@@ -270,11 +252,8 @@ export class FreezeData extends ActionData {
 }
 
 export class SleepData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.stopCoolTime,
       level: 1,
@@ -290,11 +269,8 @@ export class SleepData extends ActionData {
 }
 
 export class confusionData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.increasedDamageSuffered,
       level: 1,
@@ -310,11 +286,8 @@ export class confusionData extends ActionData {
 }
 
 export class CorrosionData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.increasedDamageSuffered,
       level: 1,
@@ -330,11 +303,8 @@ export class CorrosionData extends ActionData {
 }
 
 export class ParalysisData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.increaseCoolTime,
       level: 1,
@@ -344,11 +314,8 @@ export class ParalysisData extends ActionData {
 }
 
 export class BurnData extends ActionData{
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.slipDamage,
       level: 1,
@@ -363,22 +330,16 @@ export class BurnData extends ActionData{
 }
 
 export class PercentageDamageData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     const damage = target.status.hp * 0.3;
     target.takeDamage(damage);
   }
 }
 
 export class PoisonData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, target: Character): void {
     target.takeStateAnomaly(new StateAnomaly({
       type: StateAnomalies.slipDamage,
       level: 1,
@@ -388,9 +349,6 @@ export class PoisonData extends ActionData {
 }
 
 export class AttackData extends ActionData {
-  constructor() {
-    super();
-  }
 
   execute(character: Character, target: Character): void {
     target.takeDamage(character.attack);
@@ -398,12 +356,8 @@ export class AttackData extends ActionData {
 }
 
 export class DefendData extends ActionData {
-  constructor() {
-    super();
-  }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, _target: Character): void {
     // 一定秒数防御力が上がる仕組みを実装する
   }
 }
@@ -417,8 +371,7 @@ export class ItemData extends ActionData {
     super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute(character: Character, target: Character): void {
+  execute(_character: Character, _target: Character): void {
     // アイテムを消費して、そのアイテムの効果を発動する仕組みをここに実装する
   }
 }

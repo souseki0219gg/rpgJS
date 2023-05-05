@@ -1,44 +1,41 @@
 import { DefaultCharacterStatus as DefaultStatus } from "../constants/character";
-import BattleScene from "../scenes/battle_scene";
 import Action, { Actions, AttackData, TargetType } from "./action";
 import narrate from "../utils/narrate";
-import { formatHp } from "../utils/format";
 import ActionCard from "./action_card";
-import { TextureKeys } from "../constants/game";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
+import Game from "./game";
 
 type CharacterStatusInitArgs = {
     name?: string,
-    maxHpLevel?: integer,
-    hp?: integer,
-    maxMpLevel?: integer,
-    mp?: integer,
-    attackLevel?: integer,
-    defenseLevel?: integer,
-    speedLevel?: integer,
-    charmLevel?: integer,
+    maxHpLevel?: number,
+    hp?: number,
+    maxMpLevel?: number,
+    mp?: number,
+    attackLevel?: number,
+    defenseLevel?: number,
+    speedLevel?: number,
+    charmLevel?: number,
 }
 
 type CharacterStatus = {
     name: string,
-    maxHpLevel: integer,
-    hp: integer,
-    maxMpLevel: integer,
-    mp: integer,
-    attackLevel: integer,
-    defenseLevel: integer,
-    speedLevel: integer,
-    charmLevel: integer,
+    maxHpLevel: number,
+    hp: number,
+    maxMpLevel: number,
+    mp: number,
+    attackLevel: number,
+    defenseLevel: number,
+    speedLevel: number,
+    charmLevel: number,
 }
 
 
-class Character extends Phaser.GameObjects.Sprite {
+class Character {
+  public readonly game: Game;
   public status: CharacterStatus;
   public cards: [ActionCard, ActionCard, ActionCard, ActionCard, ActionCard];
-  private hpIndicator: Phaser.GameObjects.Text;
-  scene: BattleScene;
 
-  private readonly stateAnomalies: Array<StateAnomaly<StateAnomalies>>;
+  private stateAnomalies: Array<StateAnomaly<StateAnomalies>>;
 
 
   get maxHp() {
@@ -62,15 +59,11 @@ class Character extends Phaser.GameObjects.Sprite {
 
 
   constructor(
-    scene: BattleScene,
-    x: number,
-    y: number,
-    texture: string | Phaser.Textures.Texture,
-    frame?: string | number | undefined,
+    game: Game,
     status: CharacterStatusInitArgs = {},
   ) {
-    super(scene, x, y, texture, frame);
-    this.scene = scene; // 型変換のため
+    // ゲームのインスタンスを保存するプロパティ
+    this.game = game;
 
     this.stateAnomalies = [];
 
@@ -87,15 +80,9 @@ class Character extends Phaser.GameObjects.Sprite {
       charmLevel: status.charmLevel || DefaultStatus.charmLevel,
     };
 
-    const cardViewable = this instanceof Player;
-
     // 技カードを保存するプロパティ
     this.cards = [
       new ActionCard(
-        scene,
-        0,
-        500,
-        TextureKeys.actionCardKeys[0],
         {
           action: new Action({
             type: Actions.attack,
@@ -105,14 +92,9 @@ class Character extends Phaser.GameObjects.Sprite {
           }),
           name: "攻撃",
           recharge: 800,
-          viewable: cardViewable,
         },
       ),
       new ActionCard(
-        scene,
-        80,
-        500,
-        TextureKeys.actionCardKeys[1],
         {
           action: new Action({
             type: Actions.attack,
@@ -122,14 +104,9 @@ class Character extends Phaser.GameObjects.Sprite {
           }),
           name: "攻撃",
           recharge: 1000,
-          viewable: cardViewable,
         },
       ),
       new ActionCard(
-        scene,
-        160,
-        500,
-        TextureKeys.actionCardKeys[2],
         {
           action: new Action({
             type: Actions.attack,
@@ -139,14 +116,9 @@ class Character extends Phaser.GameObjects.Sprite {
           }),
           name: "攻撃",
           recharge: 2000,
-          viewable: cardViewable,
         },
       ),
       new ActionCard(
-        scene,
-        240,
-        500,
-        TextureKeys.actionCardKeys[3],
         {
           action: new Action({
             type: Actions.attack,
@@ -156,14 +128,9 @@ class Character extends Phaser.GameObjects.Sprite {
           }),
           name: "攻撃",
           recharge: 3000,
-          viewable: cardViewable,
         },
       ),
       new ActionCard(
-        scene,
-        320,
-        500,
-        TextureKeys.actionCardKeys[4],
         {
           action: new Action({
             type: Actions.attack,
@@ -173,16 +140,9 @@ class Character extends Phaser.GameObjects.Sprite {
           }),
           name: "攻撃",
           recharge: 4000,
-          viewable: cardViewable,
         },
       ),
     ];
-
-    // キャラクターをシーンに追加する
-    scene.add.existing(this);
-
-    // ステータスを表示させる
-    this.hpIndicator = scene.add.text(x - 30, y + 100, formatHp(this.status.hp, this.maxHp));
   }
 
   public getStateAnomalies(): Array<StateAnomaly<StateAnomalies>> {
@@ -190,10 +150,15 @@ class Character extends Phaser.GameObjects.Sprite {
   }
 
   // キャラクターがダメージを受けるメソッド
-  async takeDamage(damage: integer) {
+  async takeDamage(damage: number) {
+    if (this.isDead) {
+      return;
+    }
     this.status.hp -= damage;
-    this.updateStatusIndicator();
-    await narrate(this.scene, `${this.status.name}は${damage}ダメージくらった`);
+    if (this.status.hp < 0) {
+      this.status.hp = 0;
+    }
+    await narrate(this.game, `${this.status.name}は${damage}ダメージくらった`);
     if (this.isDead) {
       this.die();
     }
@@ -219,6 +184,14 @@ class Character extends Phaser.GameObjects.Sprite {
     }
   }
 
+  // 状態異常を解除するメソッド
+  removeStateAnomaly(type: StateAnomalies) {
+    const anomalyIndex = this.stateAnomalies.findIndex((anomaly) => anomaly.type === type);
+    if (anomalyIndex !== -1) {
+      this.stateAnomalies.splice(anomalyIndex, 1);
+    }
+  }
+
   // キャラクターが死亡しているか確認するメソッド
   get isDead() {
     return this.status.hp <= 0;
@@ -227,25 +200,39 @@ class Character extends Phaser.GameObjects.Sprite {
   // キャラクターが死亡するメソッド
   async die() {
     // キャラクターを削除する処理をここに記述する
-    await narrate(this.scene, `${this.status.name}は死亡した`);
+    await narrate(this.game, `${this.status.name}は死亡した`);
+    // 2秒後に復活する
+    setTimeout(() => {
+      this.revive();
+    }
+    , 2000);
+  }
+
+  // キャラクターが復活するメソッド
+  async revive() {
+    this.status.hp = this.maxHp;
+    this.status.mp = this.maxMp;
+    this.stateAnomalies = [];
+    await narrate(this.game, `${this.status.name}は復活した`);
   }
 
   // キャラクターが回復するメソッド
-  async restoreHealth(amount: integer, exceedMax = false) {
+  async restoreHealth(amount: number, exceedMax = false) {
     const startHp = this.status.hp;
     this.status.hp += amount;
     if (!exceedMax && this.status.hp > this.maxHp) {
       this.status.hp = this.maxHp;
     }
     const diff = this.status.hp - startHp;
-    await narrate(this.scene, `${this.status.name}の体力が${diff}回復した`);
-    this.updateStatusIndicator();
+    await narrate(this.game, `${this.status.name}の体力が${diff}回復した`);
     return diff;
   }
 
-  // ステータス表示を更新するメソッド
-  updateStatusIndicator() {
-    this.hpIndicator.setText(formatHp(this.status.hp, this.maxHp));
+  process(delta: number) {
+    this.decreaseStateAnomalyTime(delta);
+    for (const card of this.cards) {
+      card.process(delta);
+    }
   }
 }
 
@@ -263,14 +250,18 @@ export class Enemy extends Character {
     // 平均して1秒に1回打つ方式
     for (const card of this.cards) {
       if (Math.random() < delta / 1000 / 5) {
-        card.activateEffect();
+        card.activateEffect(this.game);
       }
     }
   }
 
   reset() {
     this.restoreHealth(this.maxHp - this.status.hp);
-    this.setVisible(true);
+  }
+
+  override process(delta: number): void {
+    super.process(delta);
+    this.processActionCard(delta);
   }
 }
 
