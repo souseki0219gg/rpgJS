@@ -1,5 +1,5 @@
 import React, { useState, createContext, useEffect } from "react";
-import Game from "../models/game";
+import Game from "models/game";
 
 interface GameContextType {
     game: Game;

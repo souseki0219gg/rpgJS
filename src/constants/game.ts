@@ -8,3 +8,8 @@ export const isDebugMode = true;
  * ナレーターが次の文章に移る間隔
  */
 export const narratorInterval = 1000;
+
+/**
+ * ナレーターで表示するテキストの個数
+ */
+export const narratorTextCount = 2;

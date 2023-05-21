@@ -1,7 +1,7 @@
 import { isDebugMode } from "constants/game";
 import Game from "models/game";
 
-const narrate = async (game: Game, text: string) => {
+const narrate = (game: Game, text: string) => {
   if (isDebugMode) {
     console.log(text);
   }

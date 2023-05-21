@@ -30,6 +30,7 @@ class Game {
       // Update game state here
       this.player.process(deltaTime);
       this.enemy.process(deltaTime);
+      this.narrator.process(deltaTime);
 
       this.lastUpdateTime = currentTime;
     }

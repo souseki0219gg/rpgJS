@@ -1,5 +1,6 @@
 import Action, { Actions } from "./action";
 import Game from "./game";
+import narrate from "utils/narrate";
 
 export default class ActionCard {
 
@@ -42,11 +43,11 @@ export default class ActionCard {
 
   activateEffect(game: Game) {
     if (this.canEffect) {
-      console.log(`${this.name}のアクション発動！`);
+      narrate(game, `${this.name}のアクション発動！`);
       this.remainingTime = this.recharge;
       game.triggerAction(this.action);
     } else {
-      console.log("現在は実行できない！");
+      narrate(game, "現在は実行できない！");
     }
   }
 

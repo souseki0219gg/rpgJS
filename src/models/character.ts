@@ -1,6 +1,6 @@
-import { DefaultCharacterStatus as DefaultStatus } from "../constants/character";
+import { DefaultCharacterStatus as DefaultStatus } from "constants/character";
 import Action, { Actions, AttackData, TargetType } from "./action";
-import narrate from "../utils/narrate";
+import narrate from "utils/narrate";
 import ActionCard from "./action_card";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 import Game from "./game";
@@ -150,7 +150,7 @@ class Character {
   }
 
   // キャラクターがダメージを受けるメソッド
-  async takeDamage(damage: number) {
+  takeDamage(damage: number) {
     if (this.isDead) {
       return;
     }
@@ -158,7 +158,7 @@ class Character {
     if (this.status.hp < 0) {
       this.status.hp = 0;
     }
-    await narrate(this.game, `${this.status.name}は${damage}ダメージくらった`);
+    narrate(this.game, `${this.status.name}は${damage}ダメージくらった`);
     if (this.isDead) {
       this.die();
     }
@@ -200,7 +200,7 @@ class Character {
   // キャラクターが死亡するメソッド
   async die() {
     // キャラクターを削除する処理をここに記述する
-    await narrate(this.game, `${this.status.name}は死亡した`);
+    narrate(this.game, `${this.status.name}は死亡した`);
     // 2秒後に復活する
     setTimeout(() => {
       this.revive();
@@ -213,7 +213,7 @@ class Character {
     this.status.hp = this.maxHp;
     this.status.mp = this.maxMp;
     this.stateAnomalies = [];
-    await narrate(this.game, `${this.status.name}は復活した`);
+    narrate(this.game, `${this.status.name}は復活した`);
   }
 
   // キャラクターが回復するメソッド
@@ -224,7 +224,7 @@ class Character {
       this.status.hp = this.maxHp;
     }
     const diff = this.status.hp - startHp;
-    await narrate(this.game, `${this.status.name}の体力が${diff}回復した`);
+    narrate(this.game, `${this.status.name}の体力が${diff}回復した`);
     return diff;
   }
 

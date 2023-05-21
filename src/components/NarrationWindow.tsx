@@ -11,7 +11,9 @@ const NarrationWindow: React.FC<NarrationWindowProps> = (props) => {
   return (
     <>
       <div>
-        {narrator.text}
+        {narrator.currentTexts.map((text, index) => (
+          <div key={index}>{text}</div>
+        ))}
       </div>
     </>
   );

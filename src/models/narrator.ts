@@ -1,41 +1,39 @@
-import { narratorInterval } from "constants/game";
+import { narratorInterval, narratorTextCount } from "constants/game";
 
 export default class Narrator  {
-  public textStack: Array<string>;
-  private timer: number | undefined;
+  private textStack: Array<string>;
+  // 現在のテキストが表示されてからの経過時間
+  public elapsedTime: number;
 
   constructor() {
     this.textStack = [];
+    this.elapsedTime = 0;
   }
 
   addText(text: string) {
-    if (this.isNarrating) {
-      this.textStack.push(text);
-    } else {
-      this.timer = setInterval(() => {
-        this.proceed();
-      }, narratorInterval);
-      this.textStack.push(text);
+    this.textStack.push(text);
+    if (this.textStack.length > narratorTextCount) {
+      this.shiftText();
     }
   }
 
-  // 次の文字列に進めるメソッド
-  proceed() {
-    console.log("proceed");
-    if (this.textStack.length > 0) {
-      this.textStack.shift();
-    } else {
-      clearInterval(this.timer);
-      this.timer = undefined;
+  shiftText() {
+    this.textStack.shift();
+    this.elapsedTime = 0;
+  }
+
+  process(deltaTime: number) {
+    this.elapsedTime += deltaTime;
+    if (this.elapsedTime > narratorInterval) {
+      this.shiftText();
     }
   }
 
-  // ナレーターがアクティブか確認するメソッド
   get isNarrating() {
-    return this.timer !== undefined;
+    return this.textStack.length > 0;
   }
 
-  get text() {
-    return this.textStack[0];
+  get currentTexts() {
+    return this.textStack.slice(0, narratorTextCount);
   }
 }
