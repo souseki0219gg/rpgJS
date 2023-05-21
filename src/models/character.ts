@@ -4,18 +4,7 @@ import narrate from "utils/narrate";
 import ActionCard from "./action_card";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 import Game from "./game";
-
-type CharacterStatusInitArgs = {
-    name?: string,
-    maxHpLevel?: number,
-    hp?: number,
-    maxMpLevel?: number,
-    mp?: number,
-    attackLevel?: number,
-    defenseLevel?: number,
-    speedLevel?: number,
-    charmLevel?: number,
-}
+import CharacterManager from "./character_manager";
 
 type CharacterStatus = {
     name: string,
@@ -32,6 +21,7 @@ type CharacterStatus = {
 
 class Character {
   public readonly game: Game;
+  public readonly manager: CharacterManager;
   public status: CharacterStatus;
   public cards: [ActionCard, ActionCard, ActionCard, ActionCard, ActionCard];
 
@@ -60,10 +50,14 @@ class Character {
 
   constructor(
     game: Game,
-    status: CharacterStatusInitArgs = {},
+    manager: CharacterManager,
+    status: Partial<CharacterStatus> = {},
   ) {
     // ゲームのインスタンスを保存するプロパティ
     this.game = game;
+
+    // キャラのマネージャーを保存するプロパティ
+    this.manager = manager;
 
     this.stateAnomalies = [];
 
@@ -247,9 +241,9 @@ export class Enemy extends Character {
 
   processActionCard(delta: number) {
     
-    // 平均して1秒に1回打つ方式
+    // 平均して3秒に1回打つ方式
     for (const card of this.cards) {
-      if (Math.random() < delta / 1000 / 5) {
+      if (Math.random() < delta / 3000 / 5) {
         card.activateEffect(this.game);
       }
     }

@@ -47,7 +47,7 @@ export default class ActionCard {
       this.remainingTime = this.recharge;
       game.triggerAction(this.action);
     } else {
-      narrate(game, "現在は実行できない！");
+      console.log("現在は実行できない！");
     }
   }
 
