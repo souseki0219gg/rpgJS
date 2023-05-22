@@ -1,18 +1,19 @@
-import Character, { Player, Enemy } from "./character";
+import Character from "./character";
+import { PlayerManager, EnemyManager } from "./character_manager";
 import Action, { Actions, TargetType } from "./action";
 import Narrator from "./narrator";
 
 class Game {
-  readonly player: Player;
-  readonly enemy: Enemy;
+  readonly playerManager: PlayerManager;
+  readonly enemyManager: EnemyManager;
   readonly narrator: Narrator;
 
   private lastUpdateTime: number;
 
   constructor() {
     this.lastUpdateTime = performance.now();
-    this.player = new Player(this);
-    this.enemy = new Enemy(this);
+    this.playerManager = new PlayerManager(this);
+    this.enemyManager = new EnemyManager(this);
     this.narrator = new Narrator();
   }
 
@@ -28,8 +29,9 @@ class Game {
 
     if (deltaTime >= frameInterval) {
       // Update game state here
-      this.player.process(deltaTime);
-      this.enemy.process(deltaTime);
+      this.playerManager.process(deltaTime);
+      this.enemyManager.process(deltaTime);
+      this.narrator.process(deltaTime);
 
       this.lastUpdateTime = currentTime;
     }
@@ -76,13 +78,12 @@ class Game {
    * @returns 相手のキャラ
    */
   getOpponent(character: Character) {
-    if (character == this.player) {
-      return this.enemy;
+    if (character.manager instanceof PlayerManager) {
+      return this.enemyManager.getTargetedCharacter();
     } else {
-      return this.player;
+      return this.playerManager.getTargetedCharacter();
     }
   }
-
 }
 
 export default Game;

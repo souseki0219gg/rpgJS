@@ -1,21 +1,10 @@
-import { DefaultCharacterStatus as DefaultStatus } from "../constants/character";
+import { DefaultCharacterStatus as DefaultStatus } from "constants/character";
 import Action, { Actions, AttackData, TargetType } from "./action";
-import narrate from "../utils/narrate";
+import narrate from "utils/narrate";
 import ActionCard from "./action_card";
 import { StateAnomalies, StateAnomaly } from "./state_anomaly";
 import Game from "./game";
-
-type CharacterStatusInitArgs = {
-    name?: string,
-    maxHpLevel?: number,
-    hp?: number,
-    maxMpLevel?: number,
-    mp?: number,
-    attackLevel?: number,
-    defenseLevel?: number,
-    speedLevel?: number,
-    charmLevel?: number,
-}
+import CharacterManager from "./character_manager";
 
 type CharacterStatus = {
     name: string,
@@ -32,6 +21,7 @@ type CharacterStatus = {
 
 class Character {
   public readonly game: Game;
+  public readonly manager: CharacterManager;
   public status: CharacterStatus;
   public cards: [ActionCard, ActionCard, ActionCard, ActionCard, ActionCard];
 
@@ -60,10 +50,14 @@ class Character {
 
   constructor(
     game: Game,
-    status: CharacterStatusInitArgs = {},
+    manager: CharacterManager,
+    status: Partial<CharacterStatus> = {},
   ) {
     // ゲームのインスタンスを保存するプロパティ
     this.game = game;
+
+    // キャラのマネージャーを保存するプロパティ
+    this.manager = manager;
 
     this.stateAnomalies = [];
 
@@ -150,7 +144,7 @@ class Character {
   }
 
   // キャラクターがダメージを受けるメソッド
-  async takeDamage(damage: number) {
+  takeDamage(damage: number) {
     if (this.isDead) {
       return;
     }
@@ -158,7 +152,7 @@ class Character {
     if (this.status.hp < 0) {
       this.status.hp = 0;
     }
-    await narrate(this.game, `${this.status.name}は${damage}ダメージくらった`);
+    narrate(this.game, `${this.status.name}は${damage}ダメージくらった`);
     if (this.isDead) {
       this.die();
     }
@@ -200,7 +194,7 @@ class Character {
   // キャラクターが死亡するメソッド
   async die() {
     // キャラクターを削除する処理をここに記述する
-    await narrate(this.game, `${this.status.name}は死亡した`);
+    narrate(this.game, `${this.status.name}は死亡した`);
     // 2秒後に復活する
     setTimeout(() => {
       this.revive();
@@ -213,7 +207,7 @@ class Character {
     this.status.hp = this.maxHp;
     this.status.mp = this.maxMp;
     this.stateAnomalies = [];
-    await narrate(this.game, `${this.status.name}は復活した`);
+    narrate(this.game, `${this.status.name}は復活した`);
   }
 
   // キャラクターが回復するメソッド
@@ -224,7 +218,7 @@ class Character {
       this.status.hp = this.maxHp;
     }
     const diff = this.status.hp - startHp;
-    await narrate(this.game, `${this.status.name}の体力が${diff}回復した`);
+    narrate(this.game, `${this.status.name}の体力が${diff}回復した`);
     return diff;
   }
 
@@ -247,9 +241,9 @@ export class Enemy extends Character {
 
   processActionCard(delta: number) {
     
-    // 平均して1秒に1回打つ方式
+    // 平均して3秒に1回打つ方式
     for (const card of this.cards) {
-      if (Math.random() < delta / 1000 / 5) {
+      if (Math.random() < delta / 3000 / 5) {
         card.activateEffect(this.game);
       }
     }
